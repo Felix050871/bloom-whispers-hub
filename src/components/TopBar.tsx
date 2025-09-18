@@ -1,6 +1,7 @@
-import React from 'react';
-import { Bell, Settings, LogOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bell, Settings, LogOut, User } from 'lucide-react';
 import { SheBloomLogo } from './SheBloomLogo';
+import { UserProfileDialog } from './UserProfileDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   DropdownMenu, 
@@ -12,10 +13,13 @@ import {
 
 interface TopBarProps {
   userName: string;
+  userProfile?: any;
+  onProfileUpdate?: () => void;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ userName }) => {
+export const TopBar: React.FC<TopBarProps> = ({ userName, userProfile, onProfileUpdate }) => {
   const { signOut } = useAuth();
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   return (
     <header className="bg-white border-b border-border sticky top-0 z-50">
@@ -42,6 +46,10 @@ export const TopBar: React.FC<TopBarProps> = ({ userName }) => {
                   Ciao, {userName}! 👋
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setProfileDialogOpen(true)}>
+                  <User className="w-4 h-4 mr-2" />
+                  Gestisci Profilo
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="text-vital-red">
                   <LogOut className="w-4 h-4 mr-2" />
                   Disconnetti
@@ -51,6 +59,17 @@ export const TopBar: React.FC<TopBarProps> = ({ userName }) => {
           </div>
         </div>
       </div>
+
+      {/* User Profile Dialog */}
+      <UserProfileDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        userProfile={userProfile}
+        onProfileUpdate={() => {
+          onProfileUpdate?.();
+          setProfileDialogOpen(false);
+        }}
+      />
     </header>
   );
 };

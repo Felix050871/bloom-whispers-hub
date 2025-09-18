@@ -4,6 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Heart, BookOpen, Play, Save, Plus } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 import heroImage from '@/assets/hero-bloom.jpg';
 
 interface BloomDailyProps {
@@ -11,6 +14,7 @@ interface BloomDailyProps {
 }
 
 export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
+  const { user } = useAuth();
   const [mood, setMood] = useState<number>(3);
   const [journalEntry, setJournalEntry] = useState('');
   const [moodNote, setMoodNote] = useState('');
@@ -19,8 +23,62 @@ export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
   const moodEmojis = ['😔', '😐', '🙂', '😊', '😄'];
   const moodLabels = ['Giù', 'Così così', 'Bene', 'Molto bene', 'Fantastica'];
 
-  const handleSaveMood = () => {
-    setMoodSaved(true);
+  const handleSaveMood = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('moods')
+        .insert({
+          user_id: user.id,
+          mood_level: mood,
+          note: moodNote || null
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Mood salvato",
+        description: "Il tuo mood è stato registrato con successo!"
+      });
+
+      setMoodSaved(true);
+    } catch (error: any) {
+      toast({
+        title: "Errore",
+        description: "Non è stato possibile salvare il mood",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSaveJournal = async () => {
+    if (!user || !journalEntry.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('journal_entries')
+        .insert({
+          user_id: user.id,
+          content: journalEntry,
+          type: 'text'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Diario salvato",
+        description: "La tua voce del diario è stata salvata!"
+      });
+
+      setJournalEntry('');
+    } catch (error: any) {
+      toast({
+        title: "Errore",
+        description: "Non è stato possibile salvare la voce del diario",
+        variant: "destructive"
+      });
+    }
   };
 
   const todayContent = [
@@ -179,7 +237,7 @@ export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
         />
         
         <div className="flex space-x-2">
-          <Button variant="bloom" className="flex-1">
+          <Button variant="bloom" className="flex-1" onClick={handleSaveJournal} disabled={!journalEntry.trim()}>
             <Plus className="w-4 h-4 mr-2" />
             Aggiungi voce
           </Button>

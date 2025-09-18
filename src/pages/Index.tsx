@@ -84,7 +84,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopBar userName={userData?.name || 'Bella'} />
+      <TopBar 
+        userName={userData?.name || 'Bella'} 
+        userProfile={userProfile}
+        onProfileUpdate={fetchUserProfile}
+      />
       
       <main className="container mx-auto px-4 py-6 max-w-2xl">
         {renderActiveTab()}
