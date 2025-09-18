@@ -221,9 +221,19 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Wallet Quick View */}
-        <div className="max-w-md mx-auto">
-          <WalletCard />
+        {/* Daily Content */}
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 justify-center">
+                <Calendar className="w-5 h-5 text-primary" />
+                Contenuti di oggi
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BloomDaily userName={userData?.name || 'Utente'} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
