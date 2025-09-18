@@ -33,8 +33,8 @@ const Index = () => {
 
     if (profile) {
       setUserProfile(profile);
-      // If user has interests or goals, they've completed onboarding
-      if (profile.interests?.length > 0 || profile.goals?.length > 0) {
+      // Check if user has completed onboarding
+      if (profile.onboarding_completed) {
         setIsOnboarded(true);
         setUserData({
           name: profile.name,
@@ -49,14 +49,15 @@ const Index = () => {
   const handleOnboardingComplete = async (data: OnboardingData) => {
     if (!user) return;
 
-    // Update user profile with onboarding data
+    // Update user profile with onboarding data and mark as completed
     await supabase
       .from('profiles')
       .update({
         name: data.name,
         birth_year: data.birthYear,
         interests: data.interests,
-        goals: data.goals
+        goals: data.goals,
+        onboarding_completed: true
       })
       .eq('user_id', user.id);
 
