@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { UserMenu } from "@/components/UserMenu";
+import shebloomLogo from "@/assets/shebloom-logo.png";
+import shebloomIcon from "@/assets/shebloom-icon.png";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -23,14 +25,21 @@ export function AppLayout({ children, activeSection, onSectionChange }: AppLayou
         <div className="flex h-full items-center justify-between px-4">
           <div className="flex items-center gap-4">
             {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">S</span>
-              </div>
-              <h1 className="font-bold text-lg bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-                SheBloom
-              </h1>
-            </div>
+            <button 
+              onClick={() => onSectionChange('home')} 
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
+              <img 
+                src={shebloomIcon} 
+                alt="SheBloom Icon" 
+                className="w-8 h-8 object-contain"
+              />
+              <img 
+                src={shebloomLogo} 
+                alt="SheBloom Logo" 
+                className="h-6 object-contain"
+              />
+            </button>
             
             {/* Search Bar */}
             <div className="relative hidden md:block">
