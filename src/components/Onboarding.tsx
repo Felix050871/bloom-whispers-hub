@@ -11,8 +11,9 @@ interface OnboardingProps {
 
 export interface OnboardingData {
   name: string;
+  birthYear?: number;
   interests: string[];
-  goal?: string;
+  goals: string[];
 }
 
 const PETALS = [
@@ -36,7 +37,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [data, setData] = useState<OnboardingData>({
     name: '',
     interests: [],
-    goal: undefined
+    goals: []
   });
 
   const handleInterestToggle = (interest: string) => {
@@ -192,9 +193,14 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               {GOALS.map((goal) => (
                 <button
                   key={goal.id}
-                  onClick={() => setData(prev => ({ ...prev, goal: goal.id }))}
-                  className={`card-petal p-4 text-center transition-all hover:scale-105 ${
-                    data.goal === goal.id
+              onClick={() => setData(prev => ({ 
+                ...prev, 
+                goals: prev.goals.includes(goal.id) 
+                  ? prev.goals.filter(g => g !== goal.id)
+                  : [...prev.goals, goal.id]
+              }))}
+              className={`card-petal p-4 text-center transition-all hover:scale-105 ${
+                data.goals.includes(goal.id)
                       ? 'ring-2 ring-bloom-lilac bg-bloom-lilac/10'
                       : 'hover:bg-white/80'
                   }`}
