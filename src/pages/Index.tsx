@@ -94,64 +94,13 @@ const Index = () => {
   };
 
   const handleSectionChange = (section: string) => {
+    console.log('Changing section to:', section);
     setActiveSection(section);
   };
 
   if (!isOnboarded) {
     return <Onboarding onComplete={handleOnboardingComplete} />;
   }
-
-  const quickActions = [
-    {
-      title: "Mood di oggi",
-      description: "Come ti senti oggi?",
-      icon: Heart,
-      color: "from-pink-500 to-rose-500",
-      action: () => console.log("Track mood")
-    },
-    {
-      title: "Prenota sessione",
-      description: "Connettiti con un mentore",
-      icon: Calendar,
-      color: "from-purple-500 to-indigo-500",
-      action: () => console.log("Book session")
-    },
-    {
-      title: "Scrivi nel diario",
-      description: "Rifletti sulla tua giornata",
-      icon: BookOpen,
-      color: "from-blue-500 to-cyan-500",
-      action: () => console.log("Write journal")
-    },
-    {
-      title: "Esplora community",
-      description: "Trova supporto e ispirazione",
-      icon: Users,
-      color: "from-green-500 to-emerald-500",
-      action: () => console.log("Explore community")
-    },
-  ];
-
-  const insights = [
-    {
-      title: "Streak attuale",
-      value: "7 giorni",
-      description: "Mood tracking consecutivo",
-      trend: "+2 rispetto alla settimana scorsa"
-    },
-    {
-      title: "Benessere medio",
-      value: "8.2/10",
-      description: "Ultimo mese",
-      trend: "Stabile rispetto al mese scorso"
-    },
-    {
-      title: "Sessioni completate",
-      value: "12",
-      description: "Questo mese",
-      trend: "+4 rispetto al mese scorso"
-    },
-  ];
 
   const renderContent = () => {
     if (activeSection === 'profile') {
@@ -189,7 +138,90 @@ const Index = () => {
       );
     }
 
+    if (activeSection === 'daily') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            Daily Bloom
+          </h1>
+          <Card>
+            <CardContent className="p-6">
+              <BloomDaily userName={userData?.name || 'Utente'} />
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (activeSection === 'community') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            Community
+          </h1>
+          <Card>
+            <CardContent className="p-6">
+              <SocialBloom />
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
     // Default home content
+    const quickActions = [
+      {
+        title: "Mood di oggi",
+        description: "Come ti senti oggi?",
+        icon: Heart,
+        color: "from-pink-500 to-rose-500",
+        action: () => console.log("Track mood")
+      },
+      {
+        title: "Prenota sessione",
+        description: "Connettiti con un mentore",
+        icon: Calendar,
+        color: "from-purple-500 to-indigo-500",
+        action: () => console.log("Book session")
+      },
+      {
+        title: "Scrivi nel diario",
+        description: "Rifletti sulla tua giornata",
+        icon: BookOpen,
+        color: "from-blue-500 to-cyan-500",
+        action: () => console.log("Write journal")
+      },
+      {
+        title: "Esplora community",
+        description: "Trova supporto e ispirazione",
+        icon: Users,
+        color: "from-green-500 to-emerald-500",
+        action: () => console.log("Explore community")
+      },
+    ];
+
+    const insights = [
+
+      {
+        title: "Streak attuale",
+        value: "7 giorni",
+        description: "Mood tracking consecutivo",
+        trend: "+2 rispetto alla settimana scorsa"
+      },
+      {
+        title: "Benessere medio",
+        value: "8.2/10",
+        description: "Ultimo mese",
+        trend: "Stabile rispetto al mese scorso"
+      },
+      {
+        title: "Sessioni completate",
+        value: "12",
+        description: "Questo mese",
+        trend: "+4 rispetto al mese scorso"
+      },
+    ];
+
     return (
       <div className="space-y-8">
         {/* Welcome Section */}
@@ -311,7 +343,10 @@ const Index = () => {
   };
 
   return (
-    <AppLayout onSectionChange={handleSectionChange}>
+    <AppLayout 
+      activeSection={activeSection}
+      onSectionChange={handleSectionChange}
+    >
       {renderContent()}
     </AppLayout>
   );
