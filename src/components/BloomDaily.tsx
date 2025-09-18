@@ -14,9 +14,14 @@ export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
   const [mood, setMood] = useState<number>(3);
   const [journalEntry, setJournalEntry] = useState('');
   const [moodNote, setMoodNote] = useState('');
+  const [moodSaved, setMoodSaved] = useState(false);
 
   const moodEmojis = ['😔', '😐', '🙂', '😊', '😄'];
   const moodLabels = ['Giù', 'Così così', 'Bene', 'Molto bene', 'Fantastica'];
+
+  const handleSaveMood = () => {
+    setMoodSaved(true);
+  };
 
   const todayContent = [
     {
@@ -59,47 +64,57 @@ export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
       </div>
 
       {/* Mood Tracker */}
-      <Card className="card-bloom p-bloom">
-        <h2 className="text-lg font-medium mb-4 flex items-center">
-          <Heart className="w-5 h-5 mr-2 text-vital-red" />
-          Come ti senti oggi?
-        </h2>
-        
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            {moodEmojis.map((emoji, index) => (
-              <button
-                key={index}
-                onClick={() => setMood(index + 1)}
-                className={`text-3xl p-3 rounded-full transition-all hover:scale-110 ${
-                  mood === index + 1
-                    ? 'bg-bloom-lilac/20 scale-110 mood-bounce'
-                    : 'hover:bg-muted/50'
-                }`}
-              >
-                {emoji}
-              </button>
-            ))}
+      {!moodSaved && (
+        <Card className="card-bloom p-bloom">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-medium flex items-center">
+              <Heart className="w-5 h-5 mr-2 text-vital-red" />
+              Come ti senti oggi?
+            </h2>
+            <button 
+              onClick={() => setMoodSaved(true)}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ×
+            </button>
           </div>
           
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              {moodLabels[mood - 1]}
-            </p>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              {moodEmojis.map((emoji, index) => (
+                <button
+                  key={index}
+                  onClick={() => setMood(index + 1)}
+                  className={`text-3xl p-3 rounded-full transition-all hover:scale-110 ${
+                    mood === index + 1
+                      ? 'bg-bloom-lilac/20 scale-110 mood-bounce'
+                      : 'hover:bg-muted/50'
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                {moodLabels[mood - 1]}
+              </p>
+            </div>
+            
+            <Input
+              placeholder="Aggiungi una nota (facoltativo)"
+              value={moodNote}
+              onChange={(e) => setMoodNote(e.target.value)}
+              className="mt-3"
+            />
+            
+            <Button variant="petal" size="sm" className="w-full" onClick={handleSaveMood}>
+              Salva il mio mood
+            </Button>
           </div>
-          
-          <Input
-            placeholder="Aggiungi una nota (facoltativo)"
-            value={moodNote}
-            onChange={(e) => setMoodNote(e.target.value)}
-            className="mt-3"
-          />
-          
-          <Button variant="petal" size="sm" className="w-full">
-            Salva il mio mood
-          </Button>
-        </div>
-      </Card>
+        </Card>
+      )}
 
       {/* Contenuti di oggi */}
       <div>
