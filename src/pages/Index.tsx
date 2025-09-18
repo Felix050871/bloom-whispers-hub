@@ -5,9 +5,10 @@ import { BloomDaily } from '@/components/BloomDaily';
 import { BloomSessions } from '@/components/BloomSessions';
 import { SocialBloom } from '@/components/SocialBloom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Heart, Users, TrendingUp, BookOpen } from 'lucide-react';
+import { Calendar, Heart, Users, TrendingUp, BookOpen, UserCheck } from 'lucide-react';
 import { WalletCard } from '@/components/WalletCard';
 import { AppointmentsCalendar } from '@/components/AppointmentsCalendar';
+import { BookingInterface } from '@/components/BookingInterface';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -165,6 +166,17 @@ const Index = () => {
       );
     }
 
+    if (activeSection === 'booking') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            Prenota un Appuntamento
+          </h1>
+          <BookingInterface />
+        </div>
+      );
+    }
+
     if (activeSection === 'community') {
       return (
         <div className="max-w-4xl mx-auto">
@@ -196,6 +208,13 @@ const Index = () => {
         color: "from-blue-500 to-cyan-500",
         action: () => console.log("Write journal")
       },
+      {
+        title: "Prenota appuntamento",
+        description: "Connettiti con un mentore",
+        icon: UserCheck,
+        color: "from-purple-500 to-indigo-500",
+        action: () => handleSectionChange('booking')
+      },
     ];
 
     return (
@@ -211,19 +230,19 @@ const Index = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+        <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto">
           {quickActions.map((action, index) => (
-            <Card key={index} className="group hover:shadow-md transition-all duration-300 cursor-pointer">
-              <CardContent className="p-4">
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center text-white group-hover:scale-105 transition-transform`}>
-                    <action.icon className="w-6 h-6" />
+            <Card key={index} className="group hover:shadow-md transition-all duration-300 cursor-pointer" onClick={action.action}>
+              <CardContent className="p-3">
+                <div className="flex flex-col items-center text-center gap-2">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center text-white group-hover:scale-105 transition-transform`}>
+                    <action.icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-xs group-hover:text-primary transition-colors leading-tight">
                       {action.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground leading-tight">
                       {action.description}
                     </p>
                   </div>
