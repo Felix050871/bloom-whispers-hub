@@ -32,67 +32,51 @@ const navigationItems = [
     url: "/", 
     icon: Home,
     description: "Dashboard principale"
-  },
-  { 
-    title: "Bloom Daily", 
-    url: "/daily", 
-    icon: Calendar,
-    description: "Contenuti giornalieri"
-  },
-  { 
-    title: "Sessioni", 
-    url: "/sessions", 
-    icon: Heart,
-    description: "Prenota sessioni 1:1"
-  },
-  { 
-    title: "Community", 
-    url: "/community", 
-    icon: Users,
-    description: "Connettiti con altre donne"
-  },
-  { 
-    title: "Mood Tracker", 
-    url: "/mood", 
-    icon: TrendingUp,
-    description: "Traccia il tuo benessere"
-  },
-  { 
-    title: "Journal", 
-    url: "/journal", 
-    icon: BookOpen,
-    description: "Il tuo diario personale"
-  },
+  }
 ];
 
 const accountItems = [
   { 
     title: "Profilo", 
-    url: "/profile", 
+    url: "#", 
     icon: User,
-    description: "Le tue informazioni"
+    description: "Le tue informazioni",
+    action: "profile"
   },
   { 
     title: "Wallet", 
-    url: "/wallet", 
+    url: "#", 
     icon: Wallet,
-    description: "Gestisci i pagamenti"
+    description: "Gestisci i pagamenti",
+    action: "wallet"
   },
   { 
     title: "Impostazioni", 
-    url: "/settings", 
+    url: "#", 
     icon: Settings,
-    description: "Preferenze app"
+    description: "Preferenze app",
+    action: "settings"
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  onSectionChange?: (section: string) => void;
+}
+
+export function AppSidebar({ onSectionChange }: AppSidebarProps) {
   const { state } = useSidebar();
   const location = useLocation();
   const { balance } = useWallet();
   const currentPath = location.pathname;
   
   const collapsed = state === "collapsed";
+
+  const handleItemClick = (item: typeof accountItems[0], e: React.MouseEvent) => {
+    if (item.action && onSectionChange) {
+      e.preventDefault();
+      onSectionChange(item.action);
+    }
+  };
 
   const isActive = (path: string) => {
     if (path === "/" && currentPath === "/") return true;
@@ -183,28 +167,53 @@ export function AppSidebar() {
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
-                        <NavLink 
-                          to={item.url} 
-                          className={getNavCls(isActiveRoute)}
-                          title={collapsed ? item.title : undefined}
-                        >
-                          <item.icon className={`${collapsed ? "mx-auto" : "mr-3"} h-5 w-5 flex-shrink-0`} />
-                          {!collapsed && (
-                            <div className="flex-1 min-w-0 flex items-center justify-between">
-                              <div>
-                                <div className="font-medium">{item.title}</div>
-                                <div className="text-xs text-muted-foreground truncate">
-                                  {item.description}
+                        {item.action ? (
+                          <button
+                            onClick={(e) => handleItemClick(item, e)}
+                            className={getNavCls(isActiveRoute)}
+                            title={collapsed ? item.title : undefined}
+                          >
+                            <item.icon className={`${collapsed ? "mx-auto" : "mr-3"} h-5 w-5 flex-shrink-0`} />
+                            {!collapsed && (
+                              <div className="flex-1 min-w-0 flex items-center justify-between">
+                                <div>
+                                  <div className="font-medium">{item.title}</div>
+                                  <div className="text-xs text-muted-foreground truncate">
+                                    {item.description}
+                                  </div>
                                 </div>
+                                {item.title === "Wallet" && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    €{balance.toFixed(0)}
+                                  </Badge>
+                                )}
                               </div>
-                              {item.title === "Wallet" && (
-                                <Badge variant="secondary" className="text-xs">
-                                  €{balance.toFixed(0)}
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                        </NavLink>
+                            )}
+                          </button>
+                        ) : (
+                          <NavLink 
+                            to={item.url} 
+                            className={getNavCls(isActiveRoute)}
+                            title={collapsed ? item.title : undefined}
+                          >
+                            <item.icon className={`${collapsed ? "mx-auto" : "mr-3"} h-5 w-5 flex-shrink-0`} />
+                            {!collapsed && (
+                              <div className="flex-1 min-w-0 flex items-center justify-between">
+                                <div>
+                                  <div className="font-medium">{item.title}</div>
+                                  <div className="text-xs text-muted-foreground truncate">
+                                    {item.description}
+                                  </div>
+                                </div>
+                                {item.title === "Wallet" && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    €{balance.toFixed(0)}
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                          </NavLink>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );

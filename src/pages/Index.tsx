@@ -15,35 +15,53 @@ const Index = () => {
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [userData, setUserData] = useState<OnboardingData | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [activeSection, setActiveSection] = useState<string>('home');
 
   // Check if user has completed onboarding by looking at their profile
   useEffect(() => {
     if (user) {
       fetchUserProfile();
+    } else {
+      // Reset states when user logs out
+      setIsOnboarded(false);
+      setUserData(null);
+      setUserProfile(null);
+      setActiveSection('home');
     }
   }, [user]);
 
   const fetchUserProfile = async () => {
     if (!user) return;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-    if (profile) {
-      setUserProfile(profile);
-      // Check if user has completed onboarding
-      if (profile.onboarding_completed) {
-        setIsOnboarded(true);
-        setUserData({
-          name: profile.name,
-          birthYear: profile.birth_year,
-          interests: profile.interests || [],
-          goals: profile.goals || []
-        });
+      if (profile) {
+        setUserProfile(profile);
+        console.log('Profile loaded:', profile);
+        // Check if user has completed onboarding
+        if (profile.onboarding_completed === true) {
+          setIsOnboarded(true);
+          setUserData({
+            name: profile.name,
+            birthYear: profile.birth_year,
+            interests: profile.interests || [],
+            goals: profile.goals || []
+          });
+        } else {
+          setIsOnboarded(false);
+        }
+      } else {
+        console.log('No profile found, showing onboarding');
+        setIsOnboarded(false);
       }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setIsOnboarded(false);
     }
   };
 
@@ -64,11 +82,18 @@ const Index = () => {
 
       if (error) throw error;
 
+      console.log('Onboarding completed successfully');
       setIsOnboarded(true);
       setUserData(data);
+      // Refresh profile to ensure consistency
+      await fetchUserProfile();
     } catch (error) {
       console.error('Error completing onboarding:', error);
     }
+  };
+
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
   };
 
   if (!isOnboarded) {
@@ -127,8 +152,44 @@ const Index = () => {
     },
   ];
 
-  return (
-    <AppLayout>
+  const renderContent = () => {
+    if (activeSection === 'profile') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6">Il Tuo Profilo</h1>
+          <Card>
+            <CardContent className="p-6">
+              <p>Sezione profilo in costruzione...</p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (activeSection === 'wallet') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6">Wallet</h1>
+          <WalletCard />
+        </div>
+      );
+    }
+
+    if (activeSection === 'settings') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6">Impostazioni</h1>
+          <Card>
+            <CardContent className="p-6">
+              <p>Sezione impostazioni in costruzione...</p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    // Default home content
+    return (
       <div className="space-y-8">
         {/* Welcome Section */}
         <div className="space-y-4">
@@ -245,6 +306,12 @@ const Index = () => {
           </div>
         </div>
       </div>
+    );
+  };
+
+  return (
+    <AppLayout onSectionChange={handleSectionChange}>
+      {renderContent()}
     </AppLayout>
   );
 };

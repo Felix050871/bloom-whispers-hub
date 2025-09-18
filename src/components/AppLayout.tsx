@@ -9,9 +9,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 interface AppLayoutProps {
   children: ReactNode;
+  onSectionChange?: (section: string) => void;
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
+export function AppLayout({ children, onSectionChange }: AppLayoutProps) {
   const { user } = useAuth();
 
   return (
@@ -65,7 +66,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </header>
 
         <div className="flex">
-          <AppSidebar />
+          <AppSidebar onSectionChange={onSectionChange} />
           
           {/* Main Content */}
           <main className="flex-1 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-background to-muted/20">
