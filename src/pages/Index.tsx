@@ -7,6 +7,7 @@ import { SocialBloom } from '@/components/SocialBloom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Heart, Users, TrendingUp, BookOpen } from 'lucide-react';
 import { WalletCard } from '@/components/WalletCard';
+import { AppointmentsCalendar } from '@/components/AppointmentsCalendar';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -149,6 +150,17 @@ const Index = () => {
               <BloomDaily userName={userData?.name || 'Utente'} />
             </CardContent>
           </Card>
+        </div>
+      );
+    }
+
+    if (activeSection === 'appointments') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            I Tuoi Appuntamenti
+          </h1>
+          <AppointmentsCalendar />
         </div>
       );
     }
