@@ -16,7 +16,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { User, Heart, Target, Lock, Calendar, Scale, Ruler, Palette, Droplets } from 'lucide-react';
+import { User, Heart, Target, Lock, Calendar, Scale, Ruler, Palette, Droplets, Wallet } from 'lucide-react';
+import { WalletCard } from './WalletCard';
 
 interface UserProfileDialogProps {
   open: boolean;
@@ -253,10 +254,11 @@ export const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="profile">Profilo</TabsTrigger>
             <TabsTrigger value="physical">Fisico</TabsTrigger>
             <TabsTrigger value="interests">Interessi</TabsTrigger>
+            <TabsTrigger value="wallet">Wallet</TabsTrigger>
             <TabsTrigger value="moods">Mood</TabsTrigger>
             <TabsTrigger value="security">Sicurezza</TabsTrigger>
           </TabsList>
@@ -597,6 +599,10 @@ export const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
                 </Button>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="wallet" className="space-y-4">
+            <WalletCard />
           </TabsContent>
 
           <TabsContent value="moods" className="space-y-4">

@@ -436,6 +436,111 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_balances: {
+        Row: {
+          balance_cents: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_cents?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_cents?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_preferences: {
+        Row: {
+          auto_topup_amount_cents: number
+          auto_topup_enabled: boolean
+          auto_topup_threshold_cents: number
+          auto_use_wallet: boolean
+          created_at: string
+          id: string
+          preferred_payment_method: string | null
+          refund_to_wallet: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_topup_amount_cents?: number
+          auto_topup_enabled?: boolean
+          auto_topup_threshold_cents?: number
+          auto_use_wallet?: boolean
+          created_at?: string
+          id?: string
+          preferred_payment_method?: string | null
+          refund_to_wallet?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_topup_amount_cents?: number
+          auto_topup_enabled?: boolean
+          auto_topup_threshold_cents?: number
+          auto_use_wallet?: boolean
+          created_at?: string
+          id?: string
+          preferred_payment_method?: string | null
+          refund_to_wallet?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_transactions: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          description: string
+          id: string
+          payment_method: string | null
+          receipt_url: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          description: string
+          id?: string
+          payment_method?: string | null
+          receipt_url?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          description?: string
+          id?: string
+          payment_method?: string | null
+          receipt_url?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
