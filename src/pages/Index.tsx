@@ -53,15 +53,16 @@ const Index = () => {
             goals: profile.goals || []
           });
         } else {
-          setIsOnboarded(false);
+          // Keep current state to avoid flicker if just completed onboarding
+          // Do not force setIsOnboarded(false) here
         }
       } else {
         console.log('No profile found, showing onboarding');
-        setIsOnboarded(false);
+        // Do not flip state here to avoid flicker after completion
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      setIsOnboarded(false);
+      // Keep current state on error to avoid flicker
     }
   };
 
