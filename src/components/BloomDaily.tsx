@@ -110,70 +110,7 @@ export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
   ];
 
   return (
-    <div className="pb-20 space-y-6">
-      {/* Header saluto */}
-      <div className="bg-gradient-to-br from-soft-rose/40 to-white rounded-2xl p-6 text-center">
-        <h1 className="text-2xl font-medium text-foreground mb-2">
-          Buongiorno, {userName} 🌸
-        </h1>
-        <p className="text-muted-foreground">
-          Come ti senti oggi? Iniziamo insieme questo nuovo giorno
-        </p>
-      </div>
-
-      {/* Mood Tracker */}
-      {!moodSaved && (
-        <Card className="card-bloom p-bloom">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium flex items-center">
-              <Heart className="w-5 h-5 mr-2 text-vital-red" />
-              Come ti senti oggi?
-            </h2>
-            <button 
-              onClick={() => setMoodSaved(true)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              ×
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              {moodEmojis.map((emoji, index) => (
-                <button
-                  key={index}
-                  onClick={() => setMood(index + 1)}
-                  className={`text-3xl p-3 rounded-full transition-all hover:scale-110 ${
-                    mood === index + 1
-                      ? 'bg-bloom-lilac/20 scale-110 mood-bounce'
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-            
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                {moodLabels[mood - 1]}
-              </p>
-            </div>
-            
-            <Input
-              placeholder="Aggiungi una nota (facoltativo)"
-              value={moodNote}
-              onChange={(e) => setMoodNote(e.target.value)}
-              className="mt-3"
-            />
-            
-            <Button variant="petal" size="sm" className="w-full" onClick={handleSaveMood}>
-              Salva il mio mood
-            </Button>
-          </div>
-        </Card>
-      )}
-
+    <div className="space-y-4">
       {/* Contenuti di oggi */}
       <div>
         <h2 className="text-lg font-medium mb-4 flex items-center">
