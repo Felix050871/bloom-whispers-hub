@@ -14,7 +14,380 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      answers: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_expert_answer: boolean | null
+          question_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_expert_answer?: boolean | null
+          question_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_expert_answer?: boolean | null
+          question_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          booking_date: string
+          booking_time: string
+          created_at: string | null
+          id: string
+          mentor_id: string
+          service_name: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          booking_date: string
+          booking_time: string
+          created_at?: string | null
+          id?: string
+          mentor_id: string
+          service_name: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          booking_date?: string
+          booking_time?: string
+          created_at?: string | null
+          id?: string
+          mentor_id?: string
+          service_name?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_content: {
+        Row: {
+          active: boolean | null
+          category: string
+          content_type: string
+          content_url: string | null
+          created_at: string | null
+          description: string
+          duration: string
+          id: string
+          thumbnail_url: string | null
+          title: string
+        }
+        Insert: {
+          active?: boolean | null
+          category: string
+          content_type: string
+          content_url?: string | null
+          created_at?: string | null
+          description: string
+          duration: string
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          content_type?: string
+          content_url?: string | null
+          created_at?: string | null
+          description?: string
+          duration?: string
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          type: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          type?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          type?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mentors: {
+        Row: {
+          avatar_emoji: string | null
+          bio: string | null
+          category: string
+          created_at: string | null
+          id: string
+          name: string
+          price_per_session: number
+          rating: number | null
+          reviews_count: number | null
+          specialty: string
+          updated_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          avatar_emoji?: string | null
+          bio?: string | null
+          category: string
+          created_at?: string | null
+          id?: string
+          name: string
+          price_per_session: number
+          rating?: number | null
+          reviews_count?: number | null
+          specialty: string
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          avatar_emoji?: string | null
+          bio?: string | null
+          category?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          price_per_session?: number
+          rating?: number | null
+          reviews_count?: number | null
+          specialty?: string
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      moods: {
+        Row: {
+          created_at: string | null
+          id: string
+          mood_level: number
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mood_level: number
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mood_level?: number
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      post_reactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          reaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          reaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          reaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          type: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          id?: string
+          type?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          type?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_year: number | null
+          created_at: string | null
+          email: string
+          goals: string[] | null
+          id: string
+          interests: string[] | null
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          birth_year?: number | null
+          created_at?: string | null
+          email: string
+          goals?: string[] | null
+          id?: string
+          interests?: string[] | null
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          birth_year?: number | null
+          created_at?: string | null
+          email?: string
+          goals?: string[] | null
+          id?: string
+          interests?: string[] | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          question: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          question: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          question?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
