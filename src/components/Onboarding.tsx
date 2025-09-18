@@ -61,7 +61,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background petal-pattern flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white petal-pattern flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">

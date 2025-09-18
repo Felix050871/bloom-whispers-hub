@@ -16,7 +16,7 @@
     --color-black: 0 0% 0%; /* #000000 */
     
     /* Design System Semantic Tokens */
-    --background: var(--color-soft-rose);
+    --background: var(--color-white);
     --foreground: var(--color-black);
     
     --card: var(--color-white);

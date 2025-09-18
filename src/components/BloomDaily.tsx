@@ -49,7 +49,7 @@ export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
   return (
     <div className="pb-20 space-y-6">
       {/* Header saluto */}
-      <div className="bg-gradient-to-br from-soft-rose/60 to-white/80 rounded-2xl p-6 text-center">
+      <div className="bg-gradient-to-br from-soft-rose/40 to-white rounded-2xl p-6 text-center">
         <h1 className="text-2xl font-medium text-foreground mb-2">
           Buongiorno, {userName} 🌸
         </h1>
