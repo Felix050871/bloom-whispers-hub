@@ -50,8 +50,8 @@ export function UserMenu({ onSectionChange }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <div className="h-10 w-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
+        <Button variant="ghost" className="relative p-0 w-10 h-10 rounded-full">
+          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
             {(user?.user_metadata?.name || 'U').charAt(0).toUpperCase()}
           </div>
         </Button>
