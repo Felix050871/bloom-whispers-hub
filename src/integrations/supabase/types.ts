@@ -330,40 +330,85 @@ export type Database = {
       }
       profiles: {
         Row: {
+          allergies: string[] | null
+          beauty_goals: string[] | null
+          birth_date: string | null
           birth_year: number | null
           created_at: string | null
+          dietary_preferences: string[] | null
           email: string
+          eye_color: string | null
+          fitness_level: string | null
           goals: string[] | null
+          hair_color: string | null
+          hair_type: string | null
+          health_goals: string[] | null
+          height_cm: number | null
           id: string
           interests: string[] | null
+          lifestyle: string | null
           name: string
           onboarding_completed: boolean | null
+          preferred_workout_time: string | null
+          skin_concerns: string[] | null
+          skin_type: string | null
           updated_at: string | null
           user_id: string
+          weight_kg: number | null
         }
         Insert: {
+          allergies?: string[] | null
+          beauty_goals?: string[] | null
+          birth_date?: string | null
           birth_year?: number | null
           created_at?: string | null
+          dietary_preferences?: string[] | null
           email: string
+          eye_color?: string | null
+          fitness_level?: string | null
           goals?: string[] | null
+          hair_color?: string | null
+          hair_type?: string | null
+          health_goals?: string[] | null
+          height_cm?: number | null
           id?: string
           interests?: string[] | null
+          lifestyle?: string | null
           name: string
           onboarding_completed?: boolean | null
+          preferred_workout_time?: string | null
+          skin_concerns?: string[] | null
+          skin_type?: string | null
           updated_at?: string | null
           user_id: string
+          weight_kg?: number | null
         }
         Update: {
+          allergies?: string[] | null
+          beauty_goals?: string[] | null
+          birth_date?: string | null
           birth_year?: number | null
           created_at?: string | null
+          dietary_preferences?: string[] | null
           email?: string
+          eye_color?: string | null
+          fitness_level?: string | null
           goals?: string[] | null
+          hair_color?: string | null
+          hair_type?: string | null
+          health_goals?: string[] | null
+          height_cm?: number | null
           id?: string
           interests?: string[] | null
+          lifestyle?: string | null
           name?: string
           onboarding_completed?: boolean | null
+          preferred_workout_time?: string | null
+          skin_concerns?: string[] | null
+          skin_type?: string | null
           updated_at?: string | null
           user_id?: string
+          weight_kg?: number | null
         }
         Relationships: []
       }
