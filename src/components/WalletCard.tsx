@@ -56,7 +56,10 @@ export const WalletCard = () => {
           <div className="flex gap-2">
             <Button 
               size="sm" 
-              onClick={() => setTopUpOpen(true)}
+              onClick={() => {
+                console.log('Ricarica button clicked, opening drawer');
+                setTopUpOpen(true);
+              }}
               className="flex-1"
             >
               <Plus className="h-4 w-4 mr-1" />

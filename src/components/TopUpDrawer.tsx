@@ -55,6 +55,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
   };
 
   const selectedPaymentMethodData = PAYMENT_METHODS.find(pm => pm.id === selectedPaymentMethod);
+  
+  console.log('TopUpDrawer render - open:', open, 'amountInCents:', getAmountInCents());
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
