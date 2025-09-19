@@ -148,7 +148,7 @@ const Index = () => {
           </h1>
           <Card>
             <CardContent className="p-6">
-              <BloomDaily userName={userData?.name || 'Utente'} />
+              <BloomDaily userName={userProfile?.name || 'Bella'} />
             </CardContent>
           </Card>
         </div>
@@ -222,7 +222,7 @@ const Index = () => {
         {/* Welcome Section */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            Ciao {userData?.name || 'Bella'}! 
+            Ciao {userProfile?.name || 'Bella'}! 
           </h1>
           <p className="text-muted-foreground">
             Come ti senti oggi?
@@ -262,7 +262,7 @@ const Index = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <BloomDaily userName={userData?.name || 'Utente'} />
+              <BloomDaily userName={userProfile?.name || 'Bella'} />
             </CardContent>
           </Card>
         </div>
