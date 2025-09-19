@@ -186,6 +186,8 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
           >
             {loading ? (
               "Elaborazione..."
+            ) : getAmountInCents() < 100 ? (
+              "Seleziona un importo (min. €1,00)"
             ) : (
               `Conferma Ricarica €${getAmountInEuros(getAmountInCents())}`
             )}
