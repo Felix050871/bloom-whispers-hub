@@ -53,7 +53,7 @@ export const Auth: React.FC = () => {
         title: 'Benvenuta!',
         description: 'Login effettuato con successo',
       });
-      navigate('/', { replace: true });
+      navigate('/app', { replace: true });
     }
     
     setIsLoading(false);
@@ -115,7 +115,7 @@ export const Auth: React.FC = () => {
         title: 'Registrazione completata!',
         description: 'Il tuo account è stato creato con successo',
       });
-      navigate('/', { replace: true });
+      navigate('/app', { replace: true });
     }
     
     setIsLoading(false);
