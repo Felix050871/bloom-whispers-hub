@@ -79,7 +79,7 @@ export function UserMenu({ onSectionChange }: UserMenuProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative p-0 w-10 h-10 rounded-full">
           <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
-            {(user?.user_metadata?.name || 'U').charAt(0).toUpperCase()}
+            {((userProfile?.name && userProfile.name.toLowerCase() !== 'utente' ? userProfile.name : user?.user_metadata?.name) || 'U').charAt(0).toUpperCase()}
           </div>
         </Button>
       </DropdownMenuTrigger>
@@ -87,7 +87,7 @@ export function UserMenu({ onSectionChange }: UserMenuProps) {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {userProfile?.name || user?.user_metadata?.name || 'Utente'}
+              {(userProfile?.name && userProfile.name.toLowerCase() !== 'utente' ? userProfile.name : user?.user_metadata?.name) || 'Utente'}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}

@@ -104,6 +104,8 @@ const Index = () => {
     return <Onboarding onComplete={handleOnboardingComplete} />;
   }
 
+  const displayName = (userProfile?.name && userProfile.name.toLowerCase() !== 'utente' ? userProfile.name : user?.user_metadata?.name) || '';
+  
   const renderContent = () => {
     if (activeSection === 'profile') {
       return (
@@ -148,7 +150,7 @@ const Index = () => {
           </h1>
           <Card>
             <CardContent className="p-6">
-              <BloomDaily userName={userProfile?.name || user?.user_metadata?.name || ''} />
+              <BloomDaily userName={displayName} />
             </CardContent>
           </Card>
         </div>
@@ -221,9 +223,9 @@ const Index = () => {
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="text-center space-y-2">
-          {userProfile?.name && (
+          {displayName && (
             <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Ciao {userProfile.name}!
+              Ciao {displayName}!
             </h1>
           )}
           <p className="text-muted-foreground">
@@ -264,7 +266,7 @@ const Index = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <BloomDaily userName={userProfile?.name || user?.user_metadata?.name || ''} />
+              <BloomDaily userName={displayName} />
             </CardContent>
           </Card>
         </div>
