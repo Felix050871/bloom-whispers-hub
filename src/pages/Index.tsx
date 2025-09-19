@@ -40,7 +40,7 @@ const Index = () => {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (profile) {
         setUserProfile(profile);
@@ -148,7 +148,7 @@ const Index = () => {
           </h1>
           <Card>
             <CardContent className="p-6">
-              <BloomDaily userName={userProfile?.name || 'Bella'} />
+              <BloomDaily userName={userProfile?.name || user?.user_metadata?.name || ''} />
             </CardContent>
           </Card>
         </div>
@@ -221,9 +221,11 @@ const Index = () => {
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            Ciao {userProfile?.name || 'Bella'}! 
-          </h1>
+          {userProfile?.name && (
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+              Ciao {userProfile.name}!
+            </h1>
+          )}
           <p className="text-muted-foreground">
             Come ti senti oggi?
           </p>
@@ -262,7 +264,7 @@ const Index = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <BloomDaily userName={userProfile?.name || 'Bella'} />
+              <BloomDaily userName={userProfile?.name || user?.user_metadata?.name || ''} />
             </CardContent>
           </Card>
         </div>
