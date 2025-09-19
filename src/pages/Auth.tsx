@@ -30,7 +30,7 @@ export const Auth: React.FC = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/', { replace: true });
     }
   }, [user, navigate]);
 
@@ -53,7 +53,7 @@ export const Auth: React.FC = () => {
         title: 'Benvenuta!',
         description: 'Login effettuato con successo',
       });
-      navigate('/');
+      navigate('/', { replace: true });
     }
     
     setIsLoading(false);
@@ -115,7 +115,7 @@ export const Auth: React.FC = () => {
         title: 'Registrazione completata!',
         description: 'Il tuo account è stato creato con successo',
       });
-      navigate('/');
+      navigate('/', { replace: true });
     }
     
     setIsLoading(false);
@@ -124,12 +124,6 @@ export const Auth: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-soft-rose/20 to-bloom-lilac/10 flex items-center justify-center p-4">
       <Card className="w-full max-w-md card-bloom relative">
-        <button 
-          onClick={() => navigate('/')}
-          className="absolute left-4 top-4 p-2 rounded-full hover:bg-muted/50 transition-colors z-10"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
         
         <div className="p-6 pt-12">
           <div className="text-center mb-8">
