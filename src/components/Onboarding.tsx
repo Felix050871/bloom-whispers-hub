@@ -40,6 +40,15 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     goals: []
   });
 
+  const handleSkip = () => {
+    // Completa l'onboarding con dati minimi
+    onComplete({
+      name: 'Utente',
+      interests: [],
+      goals: []
+    });
+  };
+
   const handleInterestToggle = (interest: string) => {
     setData(prev => ({
       ...prev,
@@ -64,6 +73,18 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   return (
     <div className="min-h-screen bg-white petal-pattern flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
+        {/* Skip Button */}
+        <div className="flex justify-end mb-4">
+          <Button
+            onClick={handleSkip}
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Salta
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <SheBloomLogo size="lg" className="justify-center mb-4" />
