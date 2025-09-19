@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -68,7 +68,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
           </DrawerDescription>
         </DrawerHeader>
         
-        <div className="p-4 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {/* Current Balance */}
           <Card>
             <CardContent className="pt-4">
@@ -178,7 +178,9 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
               </CardContent>
             </Card>
           )}
+        </div>
 
+        <DrawerFooter className="border-t">
           {/* Confirm Button */}
           <Button
             onClick={handleTopUp}
@@ -198,7 +200,7 @@ export const TopUpDrawer = ({ open, onOpenChange }: TopUpDrawerProps) => {
           <div className="text-xs text-muted-foreground text-center">
             I pagamenti sono elaborati in modo sicuro tramite Stripe con 3D Secure
           </div>
-        </div>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
