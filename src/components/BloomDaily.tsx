@@ -115,7 +115,7 @@ export const BloomDaily: React.FC<BloomDailyProps> = ({ userName }) => {
       <div>
         <h2 className="text-lg font-medium mb-4 flex items-center">
           <span className="text-bloom-lilac mr-2">✨</span>
-          Oggi per te
+          <span className="text-gradient-soft">Oggi per te</span>
         </h2>
         
         <div className="space-y-4">

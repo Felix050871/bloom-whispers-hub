@@ -86,7 +86,7 @@ export const SocialBloom: React.FC = () => {
         <TabsContent value="feed" className="space-y-6">
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-medium text-foreground mb-2">
+            <h1 className="text-2xl font-medium text-gradient-bloom mb-2">
               Social Bloom
             </h1>
             <p className="text-muted-foreground">

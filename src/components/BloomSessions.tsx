@@ -70,7 +70,7 @@ export const BloomSessions: React.FC = () => {
     <div className="pb-20 space-y-6">
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-medium text-foreground mb-2">
+        <h1 className="text-2xl font-medium text-gradient-primary mb-2">
           Bloom Sessions
         </h1>
         <p className="text-muted-foreground">
