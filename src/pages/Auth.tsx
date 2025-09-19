@@ -30,7 +30,7 @@ export const Auth: React.FC = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/', { replace: true });
+      navigate('/app', { replace: true });
     }
   }, [user, navigate]);
 
@@ -65,7 +65,7 @@ export const Auth: React.FC = () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: provider,
       options: {
-        redirectTo: `${window.location.origin}/`
+        redirectTo: `${window.location.origin}/app`
       }
     });
     
