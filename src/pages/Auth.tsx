@@ -29,10 +29,8 @@ export const Auth: React.FC = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
-      navigate('/', { replace: true });
-    }
-  }, [user, navigate]);
+    // Non reindirizziamo automaticamente: /app resta la pagina di login/registrazione
+  }, [user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +51,7 @@ export const Auth: React.FC = () => {
         title: 'Benvenuta!',
         description: 'Login effettuato con successo',
       });
-      navigate('/app', { replace: true });
+      navigate('/', { replace: true });
     }
     
     setIsLoading(false);
@@ -115,7 +113,7 @@ export const Auth: React.FC = () => {
         title: 'Registrazione completata!',
         description: 'Il tuo account è stato creato con successo',
       });
-      navigate('/app', { replace: true });
+      navigate('/', { replace: true });
     }
     
     setIsLoading(false);
