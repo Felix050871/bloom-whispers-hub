@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Wallet, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useWallet } from "@/hooks/useWallet";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserMenuProps {
   onSectionChange: (section: string) => void;
@@ -20,6 +21,32 @@ interface UserMenuProps {
 export function UserMenu({ onSectionChange }: UserMenuProps) {
   const { user, signOut } = useAuth();
   const { balance } = useWallet();
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Fetch user profile
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  const fetchUserProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile) {
+        setUserProfile(profile);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   const accountItems = [
     {
@@ -60,7 +87,7 @@ export function UserMenu({ onSectionChange }: UserMenuProps) {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {user?.user_metadata?.name || 'Utente'}
+              {userProfile?.name || user?.user_metadata?.name || 'Utente'}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
