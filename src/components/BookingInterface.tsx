@@ -127,14 +127,23 @@ export function BookingInterface() {
     if (!user) return;
 
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('interests')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
 
       if (profile?.interests) {
+        console.log('User interests loaded:', profile.interests);
         setUserInterests(profile.interests);
+      } else {
+        console.log('No interests found for user');
+        setUserInterests([]);
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -238,6 +247,9 @@ export function BookingInterface() {
       if (!aIsPreferred && bIsPreferred) return 1;
       return 0;
     });
+
+    console.log('User interests:', userInterests);
+    console.log('Categories:', categories.map(c => c.id));
 
     return (
       <div className="space-y-6">
