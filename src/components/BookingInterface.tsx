@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Star, Heart, Brain, Dumbbell, Sparkles, Zap, Clock, Euro, ChevronLeft } from "lucide-react";
+import { CalendarIcon, Star, Heart, Brain, Dumbbell, Sparkles, Zap, Clock, Euro, ChevronLeft, Search, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -37,14 +38,14 @@ const categories = [
     color: 'from-pink-500 to-rose-500'
   },
   {
-    id: 'salute',
-    name: 'Salute femminile',
+    id: 'pinkcare',
+    name: 'PinkCare - Salute femminile',
     emoji: '🌸',
     icon: Sparkles,
     color: 'from-purple-500 to-pink-500'
   },
   {
-    id: 'fitness',
+    id: 'sport',
     name: 'Sport & Nutrimento',
     emoji: '💪',
     icon: Dumbbell,
@@ -58,11 +59,11 @@ const categories = [
     color: 'from-yellow-500 to-orange-500'
   },
   {
-    id: 'mindfulness',
-    name: 'Mindfulness & Crescita',
-    emoji: '🧘‍♀️',
-    icon: Brain,
-    color: 'from-blue-500 to-cyan-500'
+    id: 'stile',
+    name: 'Stile & Identità',
+    emoji: '👗',
+    icon: Sparkles,
+    color: 'from-indigo-500 to-blue-500'
   },
   {
     id: 'astrologia',
@@ -90,13 +91,55 @@ export function BookingInterface() {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [note, setNote] = useState<string>('');
   const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [userInterests, setUserInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Fetch user interests on mount
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (selectedCategory) {
       fetchMentorsByCategory(selectedCategory);
     }
   }, [selectedCategory]);
+
+  // Filter mentors based on search query
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const filtered = mentors.filter(mentor =>
+        mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mentor.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mentor.bio.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredMentors(filtered);
+    } else {
+      setFilteredMentors(mentors);
+    }
+  }, [mentors, searchQuery]);
+
+  const fetchUserProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('interests')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile?.interests) {
+        setUserInterests(profile.interests);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
 
   const fetchMentorsByCategory = async (category: string) => {
     setLoading(true);
@@ -185,48 +228,79 @@ export function BookingInterface() {
     }
   };
 
-  const renderCategorySelection = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Scegli una categoria</h2>
-        <p className="text-muted-foreground">
-          Seleziona l'area in cui vorresti ricevere supporto
-        </p>
-      </div>
+  const renderCategorySelection = () => {
+    // Sort categories to show user's interests first
+    const sortedCategories = [...categories].sort((a, b) => {
+      const aIsPreferred = userInterests.includes(a.id);
+      const bIsPreferred = userInterests.includes(b.id);
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {categories.map((category) => {
-          const Icon = category.icon;
-          return (
-            <Card 
-              key={category.id} 
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                selectedCategory === category.id ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => {
-                setSelectedCategory(category.id);
-                setStep('mentor');
-              }}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center text-white`}>
-                    <Icon className="w-6 h-6" />
+      if (aIsPreferred && !bIsPreferred) return -1;
+      if (!aIsPreferred && bIsPreferred) return 1;
+      return 0;
+    });
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Scegli una categoria</h2>
+          <p className="text-muted-foreground">
+            Seleziona l'area in cui vorresti ricevere supporto
+          </p>
+          {userInterests.length > 0 && (
+            <p className="text-sm text-primary mt-1 flex items-center gap-1">
+              <Crown className="w-4 h-4" />
+              Le categorie evidenziate corrispondono ai tuoi interessi
+            </p>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {sortedCategories.map((category) => {
+            const Icon = category.icon;
+            const isPreferred = userInterests.includes(category.id);
+            return (
+              <Card 
+                key={category.id} 
+                className={`cursor-pointer transition-all hover:shadow-md ${
+                  selectedCategory === category.id ? 'ring-2 ring-primary' : ''
+                } ${isPreferred ? 'ring-2 ring-primary/50 bg-primary/5' : ''}`}
+                onClick={() => {
+                  setSelectedCategory(category.id);
+                  setStep('mentor');
+                }}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center text-white relative`}>
+                      <Icon className="w-6 h-6" />
+                      {isPreferred && (
+                        <div className="absolute -top-1 -right-1">
+                          <Crown className="w-4 h-4 text-primary" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2">
+                        {category.name}
+                        {isPreferred && (
+                          <Badge variant="secondary" className="text-xs">
+                            Tuo interesse
+                          </Badge>
+                        )}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Mentori specializzati disponibili
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{category.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Mentori specializzati disponibili
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderMentorSelection = () => (
     <div className="space-y-6">
@@ -242,6 +316,17 @@ export function BookingInterface() {
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+        <Input
+          placeholder="Cerca per nome, specialità o descrizione..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
@@ -252,51 +337,70 @@ export function BookingInterface() {
         </div>
       ) : (
         <div className="space-y-4">
-          {mentors.map((mentor) => (
-            <Card 
-              key={mentor.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                selectedMentor?.id === mentor.id ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => {
-                setSelectedMentor(mentor);
-                setStep('datetime');
-              }}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">{mentor.avatar_emoji}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold">{mentor.name}</h3>
-                      {mentor.verified && (
-                        <Badge variant="secondary" className="text-xs">Verificato</Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {mentor.specialty}
-                    </p>
-                    <p className="text-sm mb-3">{mentor.bio}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">{mentor.rating}</span>
-                          <span className="text-sm text-muted-foreground">
-                            ({mentor.reviews_count} recensioni)
-                          </span>
-                        </div>
+          {filteredMentors.length === 0 ? (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-muted-foreground">
+                  {searchQuery ? 'Nessun mentore trovato per la tua ricerca.' : 'Nessun mentore disponibile in questa categoria.'}
+                </p>
+                {searchQuery && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSearchQuery('')}
+                    className="mt-2"
+                  >
+                    Rimuovi filtri
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            filteredMentors.map((mentor) => (
+              <Card 
+                key={mentor.id}
+                className={`cursor-pointer transition-all hover:shadow-md ${
+                  selectedMentor?.id === mentor.id ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => {
+                  setSelectedMentor(mentor);
+                  setStep('datetime');
+                }}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="text-3xl">{mentor.avatar_emoji}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold">{mentor.name}</h3>
+                        {mentor.verified && (
+                          <Badge variant="secondary" className="text-xs">Verificato</Badge>
+                        )}
                       </div>
-                      <div className="flex items-center gap-1 font-semibold">
-                        <Euro className="w-4 h-4" />
-                        {mentor.price_per_session}
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {mentor.specialty}
+                      </p>
+                      <p className="text-sm mb-3">{mentor.bio}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm font-medium">{mentor.rating}</span>
+                            <span className="text-sm text-muted-foreground">
+                              ({mentor.reviews_count} recensioni)
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 font-semibold">
+                          <Euro className="w-4 h-4" />
+                          {mentor.price_per_session}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       )}
     </div>
