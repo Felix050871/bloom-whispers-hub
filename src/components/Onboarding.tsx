@@ -73,18 +73,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   return (
     <div className="min-h-screen bg-white petal-pattern flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
-        {/* Skip Button */}
-        <div className="flex justify-end mb-4">
-          <Button
-            onClick={handleSkip}
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Salta
-          </Button>
-        </div>
-
         {/* Header */}
         <div className="text-center mb-8">
           <SheBloomLogo size="lg" className="justify-center mb-4" />
@@ -139,15 +127,25 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               ))}
             </div>
 
-            <Button
-              onClick={() => setStep(2)}
-              disabled={data.interests.length === 0}
-              variant="bloom"
-              size="lg"
-              className="w-full"
-            >
-              Continua
-            </Button>
+            <div className="flex space-x-3">
+              <Button
+                onClick={handleSkip}
+                variant="ghost"
+                size="lg"
+                className="flex-1"
+              >
+                Salta
+              </Button>
+              <Button
+                onClick={() => setStep(2)}
+                disabled={data.interests.length === 0}
+                variant="bloom"
+                size="lg"
+                className="flex-1"
+              >
+                Continua
+              </Button>
+            </div>
           </Card>
         )}
 
@@ -184,6 +182,14 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 className="flex-1"
               >
                 Indietro
+              </Button>
+              <Button
+                onClick={handleSkip}
+                variant="ghost"
+                size="lg"
+                className="flex-1"
+              >
+                Salta
               </Button>
               <Button
                 onClick={() => setStep(3)}
@@ -240,6 +246,14 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 className="flex-1"
               >
                 Indietro
+              </Button>
+              <Button
+                onClick={handleSkip}
+                variant="ghost"
+                size="lg"
+                className="flex-1"
+              >
+                Salta
               </Button>
               <Button
                 onClick={handleComplete}
