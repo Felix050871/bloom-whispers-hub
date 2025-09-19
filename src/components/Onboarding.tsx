@@ -76,9 +76,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         {/* Header */}
         <div className="text-center mb-8">
           <SheBloomLogo size="lg" className="justify-center mb-4" />
-          <h1 className="text-2xl font-medium text-foreground mb-2">
-            Benvenuta in SheBloom
-          </h1>
           <p className="text-muted-foreground">
             Uno spazio gentile, tutto per te
           </p>
