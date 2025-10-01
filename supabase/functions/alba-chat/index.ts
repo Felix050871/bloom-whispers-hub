@@ -34,10 +34,15 @@ serve(async (req) => {
 LINEE GUIDA IMPORTANTI:
 - Tono empatico, chiaro, non giudicante
 - Risposte concise e pratiche (max 200 parole)
-- Se la richiesta è troppo complessa o sensibile, suggerisci di "parlare con un'esperta" per supporto umano personalizzato
 - Per emergenze o situazioni di pericolo, indirizza SEMPRE a ALBA SOS (pulsante rosso) e al 112
-- Non sostituisci professionisti medici o psicologi - sii chiara quando serve consulto professionale
-- Rispetta la privacy e la sensibilità dei temi trattati`;
+- Non sostituisci professionisti medici o psicologi
+- Rispetta la privacy e la sensibilità dei temi trattati
+
+IMPORTANTE: Usa la funzione suggest_expert SOLO quando:
+- La situazione richiede competenze mediche, psicologiche o legali specializzate
+- Il problema è complesso e richiede supporto umano continuativo
+- La persona sta affrontando una situazione seria che va oltre un consiglio generale
+- NON usarla per domande generiche o che puoi rispondere tu stessa`;
 
     const messages = [
       { role: "system", content: fullSystemPrompt },
@@ -45,18 +50,46 @@ LINEE GUIDA IMPORTANTI:
       { role: "user", content: message }
     ];
 
+    const requestBody: any = {
+      model: "google/gemini-2.5-flash",
+      messages,
+      temperature: 0.7,
+      max_tokens: 500,
+      tools: [
+        {
+          type: "function",
+          function: {
+            name: "suggest_expert",
+            description: "Suggerisci di parlare con un'esperta quando la situazione richiede supporto professionale specializzato (medico, psicologo, legale). NON usare per domande generiche.",
+            parameters: {
+              type: "object",
+              properties: {
+                reason: { 
+                  type: "string",
+                  description: "Motivo per cui serve un'esperta"
+                },
+                urgency: {
+                  type: "string",
+                  enum: ["low", "medium", "high"],
+                  description: "Urgenza della consultazione"
+                }
+              },
+              required: ["reason", "urgency"],
+              additionalProperties: false
+            }
+          }
+        }
+      ],
+      tool_choice: "auto"
+    };
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages,
-        temperature: 0.7,
-        max_tokens: 500,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -78,17 +111,36 @@ LINEE GUIDA IMPORTANTI:
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    
+    // Check if AI suggested expert consultation via tool call
+    let needsExpert = false;
+    let expertReason = "";
+    let aiResponse = "";
 
-    // Controlla se la risposta suggerisce di parlare con un'esperta
-    const needsExpert = aiResponse.toLowerCase().includes("esperta") || 
-                       aiResponse.toLowerCase().includes("professionista") ||
-                       aiResponse.toLowerCase().includes("specialista");
+    if (data.choices[0].message.tool_calls && data.choices[0].message.tool_calls.length > 0) {
+      // AI called the suggest_expert function
+      const toolCall = data.choices[0].message.tool_calls[0];
+      if (toolCall.function.name === "suggest_expert") {
+        needsExpert = true;
+        const args = JSON.parse(toolCall.function.arguments);
+        expertReason = args.reason;
+        
+        // Generate a natural response that includes the expert suggestion
+        aiResponse = data.choices[0].message.content || 
+          "Per questa situazione, ti consiglio di parlare con un'esperta che possa darti un supporto personalizzato e professionale.";
+      }
+    } else {
+      // Normal response without tool call
+      aiResponse = data.choices[0].message.content;
+    }
+
+    console.log("AI Response processed:", { needsExpert, hasToolCall: !!data.choices[0].message.tool_calls });
 
     return new Response(
       JSON.stringify({ 
         response: aiResponse,
         needsExpert,
+        expertReason,
         category
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
