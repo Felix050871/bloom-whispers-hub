@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, MessageCircle, Share, Plus, HelpCircle, CheckCircle } from 'lucide-react';
 
 export const SocialBloom: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
 
   const posts = [
@@ -128,7 +130,11 @@ export const SocialBloom: React.FC = () => {
           {/* Posts */}
           <div className="space-y-4">
             {posts.map((post) => (
-              <Card key={post.id} className="card-bloom p-6">
+              <Card 
+                key={post.id} 
+                className="card-bloom p-6 cursor-pointer transition-all hover:shadow-md"
+                onClick={() => navigate(`/post/${post.id}`)}
+              >
                 <div className="flex items-start space-x-3 mb-4">
                   <div className="w-10 h-10 bg-gradient-to-br from-bloom-lilac to-bloom-lilac/60 rounded-full flex items-center justify-center text-white font-medium">
                     {post.author[0]}
@@ -215,7 +221,11 @@ export const SocialBloom: React.FC = () => {
           {/* Lista domande */}
           <div className="space-y-4">
             {questions.map((q) => (
-              <Card key={q.id} className="card-bloom p-4">
+              <Card 
+                key={q.id} 
+                className="card-bloom p-4 cursor-pointer transition-all hover:shadow-md"
+                onClick={() => navigate(`/question/${q.id}`)}
+              >
                 <div className="mb-3">
                   <h3 className="font-medium text-foreground mb-1">{q.question}</h3>
                   <p className="text-xs text-bloom-lilac">{q.category}</p>

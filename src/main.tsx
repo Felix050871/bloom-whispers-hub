@@ -6,6 +6,8 @@ import './index.css'
 import Index from './pages/Index.tsx'
 import NotFound from './pages/NotFound.tsx'
 import { Auth } from './pages/Auth.tsx'
+import PostDetail from './pages/PostDetail.tsx'
+import QuestionDetail from './pages/QuestionDetail.tsx'
 import { AuthProvider } from './hooks/useAuth.tsx'
 import { WalletProvider } from './hooks/useWallet.tsx'
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'
@@ -19,6 +21,14 @@ const router = createBrowserRouter([
   {
     path: "/app",
     element: <Auth />,
+  },
+  {
+    path: "/post/:id",
+    element: <ProtectedRoute><PostDetail /></ProtectedRoute>,
+  },
+  {
+    path: "/question/:id",
+    element: <ProtectedRoute><QuestionDetail /></ProtectedRoute>,
   },
   {
     path: "*",
