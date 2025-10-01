@@ -81,6 +81,17 @@ USA LA FUNZIONE schedule_followup QUANDO:
 - Vuoi fare un check-in per vedere come è andata
 - NON usarla per cose generiche o passate
 
+COME USARE schedule_followup (ESEMPI):
+Se utente dice "Tra 2 giorni ho un esame":
+  → topic: "esame"
+  → context: "L'utente ha un esame tra 2 giorni e ha chiesto consigli su come prepararsi"
+  → days_until_followup: 3 (un giorno dopo l'esame)
+
+Se utente dice "Domani ho un colloquio":
+  → topic: "colloquio di lavoro"  
+  → context: "L'utente ha un colloquio domani e ha chiesto suggerimenti"
+  → days_until_followup: 2 (un giorno dopo il colloquio)
+
 RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, spontanea.`;
 
     const messages = [
@@ -145,21 +156,21 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
           type: "function",
           function: {
             name: "schedule_followup",
-            description: "Programma un follow-up quando dai un consiglio per un evento futuro. ALBA chiederà poi come è andata chiamando l'utente per nome.",
+            description: "Programma un follow-up automatico quando l'utente ti parla di un evento futuro (esame, colloquio, appuntamento). Tu dovrai chiederle come è andata dopo l'evento. COMPILA SEMPRE tutti i parametri richiesti.",
             parameters: {
               type: "object",
               properties: {
                 topic: {
                   type: "string",
-                  description: "Breve titolo dell'evento (es: 'primo appuntamento', 'colloquio lavoro', 'esame')"
+                  description: "Titolo breve dell'evento di cui l'utente parla. Esempi: 'esame', 'colloquio di lavoro', 'primo appuntamento', 'visita medica'"
                 },
                 context: {
                   type: "string",
-                  description: "Contesto del consiglio dato, cosa aveva chiesto l'utente"
+                  description: "Descrizione completa: cosa ti ha chiesto l'utente e che consiglio hai dato. Esempio: 'L utente ha un esame importante tra 2 giorni e le ho consigliato di...' SEMPRE una frase completa."
                 },
                 days_until_followup: {
                   type: "integer",
-                  description: "Giorni dopo cui fare il follow-up (es: 1 per domani, 2 per dopodomani)",
+                  description: "Quanti giorni aspettare prima di ricontattarla. Se l'evento è tra N giorni, usa N+1 (es: esame tra 2 giorni = 3). Minimo 1, massimo 7.",
                   enum: [1, 2, 3, 4, 5, 6, 7]
                 }
               },
