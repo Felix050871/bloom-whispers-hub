@@ -100,11 +100,23 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
       { role: "user", content: message }
     ];
 
+    // Detect if user is talking about a future event
+    const futureEventPatterns = /\b(domani|tra \d+ giorni?|dopodomani|prossim[ao]|ho un[ao]?\s+(esame|colloquio|appuntamento|visita|incontro))\b/i;
+    const hasFutureEvent = futureEventPatterns.test(message);
+    
+    // Add explicit reminder if future event detected
+    if (hasFutureEvent) {
+      messages.push({
+        role: "system",
+        content: "IMPORTANTE: L'utente sta parlando di un evento futuro. DEVI usare la funzione schedule_followup con tutti i parametri compilati (topic, context, days_until_followup) per programmare un follow-up."
+      });
+    }
+
     const requestBody: any = {
       model: "google/gemini-2.5-pro", // Pro model handles function calling better
       messages,
       temperature: 0.7,
-      max_tokens: 500,
+      max_tokens: 1500, // Increased for complete responses
       tools: [
         {
           type: "function",
