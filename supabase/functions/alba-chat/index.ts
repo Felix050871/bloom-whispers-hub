@@ -101,7 +101,7 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
     ];
 
     const requestBody: any = {
-      model: "google/gemini-2.5-flash",
+      model: "google/gemini-2.5-pro", // Pro model handles function calling better
       messages,
       temperature: 0.7,
       max_tokens: 500,
