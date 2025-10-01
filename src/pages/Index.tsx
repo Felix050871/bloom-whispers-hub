@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Onboarding, OnboardingData } from '@/components/Onboarding';
 import { AppLayout } from '@/components/AppLayout';
 import { BloomDaily } from '@/components/BloomDaily';
@@ -14,10 +15,18 @@ import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [userData, setUserData] = useState<OnboardingData | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [activeSection, setActiveSection] = useState<string>('home');
+
+  // Update active section from navigation state
+  useEffect(() => {
+    if (location.state?.activeSection) {
+      setActiveSection(location.state.activeSection);
+    }
+  }, [location.state]);
 
   // Check if user has completed onboarding by looking at their profile
   useEffect(() => {

@@ -10,18 +10,7 @@ export default function QuestionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [newAnswer, setNewAnswer] = useState('');
-
-  // Mock data - in produzione verrebbe da Supabase
-  const question = {
-    id: Number(id),
-    question: 'Come gestire l\'ansia pre-mestruale?',
-    category: 'PinkCare - Salute femminile',
-    author: 'Anna',
-    time: '1h fa',
-    answers: 3
-  };
-
-  const answers = [
+  const [answers, setAnswers] = useState([
     {
       id: 1,
       author: 'Dr.ssa Maria Rossi',
@@ -49,14 +38,38 @@ export default function QuestionDetail() {
       time: '15min fa',
       isAccepted: false
     }
-  ];
+  ]);
+
+  // Mock data - in produzione verrebbe da Supabase
+  const question = {
+    id: Number(id),
+    question: 'Come gestire l\'ansia pre-mestruale?',
+    category: 'PinkCare - Salute femminile',
+    author: 'Anna',
+    time: '1h fa',
+    answers: 3
+  };
+
 
   const handleAddAnswer = () => {
     if (newAnswer.trim()) {
-      // In produzione, salvare su Supabase
-      console.log('Nuova risposta:', newAnswer);
+      const newAnswerObj = {
+        id: answers.length + 1,
+        author: 'Tu',
+        isExpert: false,
+        content: newAnswer,
+        likes: 0,
+        time: 'Adesso',
+        isAccepted: false
+      };
+      setAnswers([...answers, newAnswerObj]);
       setNewAnswer('');
+      console.log('Risposta aggiunta:', newAnswerObj);
     }
+  };
+
+  const handleBackToQuestions = () => {
+    navigate('/', { state: { activeSection: 'community' } });
   };
 
   return (
@@ -67,7 +80,7 @@ export default function QuestionDetail() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
+            onClick={handleBackToQuestions}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

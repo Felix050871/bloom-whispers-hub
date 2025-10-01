@@ -11,6 +11,11 @@ export default function PostDetail() {
   const navigate = useNavigate();
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
   const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState([
+    { id: 1, author: 'Emma', content: 'Bellissima idea! Anche io vorrei iniziare', time: '1h fa' },
+    { id: 2, author: 'Giulia', content: 'La gratitudine cambia tutto! 💕', time: '1h fa' },
+    { id: 3, author: 'Laura', content: 'Che consiglio meraviglioso, grazie per la condivisione', time: '30min fa' }
+  ]);
 
   // Mock data - in produzione verrebbe da Supabase
   const post = {
@@ -25,11 +30,6 @@ export default function PostDetail() {
     isExpert: false
   };
 
-  const comments = [
-    { id: 1, author: 'Emma', content: 'Bellissima idea! Anche io vorrei iniziare', time: '1h fa' },
-    { id: 2, author: 'Giulia', content: 'La gratitudine cambia tutto! 💕', time: '1h fa' },
-    { id: 3, author: 'Laura', content: 'Che consiglio meraviglioso, grazie per la condivisione', time: '30min fa' }
-  ];
 
   const reactions = [
     { id: 'inspire', emoji: '✨', label: 'Mi ispira' },
@@ -39,10 +39,20 @@ export default function PostDetail() {
 
   const handleAddComment = () => {
     if (newComment.trim()) {
-      // In produzione, salvare su Supabase
-      console.log('Nuovo commento:', newComment);
+      const newCommentObj = {
+        id: comments.length + 1,
+        author: 'Tu',
+        content: newComment,
+        time: 'Adesso'
+      };
+      setComments([...comments, newCommentObj]);
       setNewComment('');
+      console.log('Commento aggiunto:', newCommentObj);
     }
+  };
+
+  const handleBackToFeed = () => {
+    navigate('/', { state: { activeSection: 'community' } });
   };
 
   return (
@@ -53,7 +63,7 @@ export default function PostDetail() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
+            onClick={handleBackToFeed}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
