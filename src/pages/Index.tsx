@@ -6,6 +6,7 @@ import { BloomDaily } from '@/components/BloomDaily';
 import { BloomSessions } from '@/components/BloomSessions';
 import { SocialBloom } from '@/components/SocialBloom';
 import { MoodTracker } from '@/components/MoodTracker';
+import { AlbaFollowups } from '@/components/AlbaFollowups';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Heart, Users, TrendingUp, BookOpen, UserCheck } from 'lucide-react';
 import { WalletCard } from '@/components/WalletCard';
@@ -239,6 +240,9 @@ const Index = () => {
 
     return (
       <div className="space-y-6">
+        {/* ALBA Follow-ups */}
+        <AlbaFollowups />
+
         {/* Welcome Section */}
         <div className="text-center space-y-2">
           {displayName && (

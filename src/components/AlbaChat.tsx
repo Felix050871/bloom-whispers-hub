@@ -35,6 +35,7 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -60,7 +61,8 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
           message: userMessage,
           category,
           conversationHistory,
-          userId: user?.id
+          userId: user?.id,
+          conversationId
         }
       });
 
@@ -83,12 +85,26 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
           needsExpert: data.needsExpert
         }]);
         
+        // Store conversation ID for future messages
+        if (data.conversationId && !conversationId) {
+          setConversationId(data.conversationId);
+        }
+        
         // Show subtle notification if mood was tracked
         if (data.moodTracked) {
           toast({
             title: "Mood tracciato",
             description: "Ho registrato il tuo stato d'animo 💚",
             duration: 2000,
+          });
+        }
+        
+        // Show notification if follow-up was scheduled
+        if (data.followupScheduled) {
+          toast({
+            title: "Ti ricontatterò! 📅",
+            description: "Ti chiederò come è andata",
+            duration: 3000,
           });
         }
       }

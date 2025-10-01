@@ -14,6 +14,109 @@ export type Database = {
   }
   public: {
     Tables: {
+      alba_conversations: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      alba_followups: {
+        Row: {
+          completed_at: string | null
+          context: string
+          conversation_id: string
+          created_at: string
+          followup_date: string
+          id: string
+          response: string | null
+          status: string
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          context: string
+          conversation_id: string
+          created_at?: string
+          followup_date: string
+          id?: string
+          response?: string | null
+          status?: string
+          topic: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          context?: string
+          conversation_id?: string
+          created_at?: string
+          followup_date?: string
+          id?: string
+          response?: string | null
+          status?: string
+          topic?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alba_followups_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "alba_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alba_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alba_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "alba_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       answers: {
         Row: {
           content: string

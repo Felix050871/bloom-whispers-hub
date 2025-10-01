@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, category, conversationHistory, userId } = await req.json();
+    const { message, category, conversationHistory, userId, conversationId } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -52,6 +52,12 @@ USA LA FUNZIONE suggest_expert SOLO SE:
 - Il problema è serio e complesso, oltre un consiglio tra amiche
 - La situazione richiede supporto professionale continuativo
 - NON per domande normali che puoi gestire tu
+
+USA LA FUNZIONE schedule_followup QUANDO:
+- Dai un consiglio per un evento futuro (appuntamento, colloquio, esame, uscita)
+- La persona ti chiede supporto su qualcosa che accadrà
+- Vuoi fare un check-in per vedere come è andata
+- NON usarla per cose generiche o passate
 
 RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, spontanea.`;
 
@@ -112,6 +118,33 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
               additionalProperties: false
             }
           }
+        },
+        {
+          type: "function",
+          function: {
+            name: "schedule_followup",
+            description: "Programma un follow-up quando dai un consiglio per un evento futuro. ALBA chiederà poi come è andata chiamando l'utente per nome.",
+            parameters: {
+              type: "object",
+              properties: {
+                topic: {
+                  type: "string",
+                  description: "Breve titolo dell'evento (es: 'primo appuntamento', 'colloquio lavoro', 'esame')"
+                },
+                context: {
+                  type: "string",
+                  description: "Contesto del consiglio dato, cosa aveva chiesto l'utente"
+                },
+                days_until_followup: {
+                  type: "integer",
+                  description: "Giorni dopo cui fare il follow-up (es: 1 per domani, 2 per dopodomani)",
+                  enum: [1, 2, 3, 4, 5, 6, 7]
+                }
+              },
+              required: ["topic", "context", "days_until_followup"],
+              additionalProperties: false
+            }
+          }
         }
       ],
       tool_choice: "auto"
@@ -146,13 +179,54 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
 
     const data = await response.json();
     
-    // Check if AI suggested expert consultation or tracked mood via tool calls
+    // Create Supabase client for conversation and message storage
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.39.3');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    // Save or get conversation
+    let finalConversationId = conversationId;
+    if (!finalConversationId && userId) {
+      const { data: convData, error: convError } = await supabase
+        .from('alba_conversations')
+        .insert({ user_id: userId, category })
+        .select()
+        .single();
+      
+      if (!convError && convData) {
+        finalConversationId = convData.id;
+      }
+    }
+    
+    // Save user message
+    if (finalConversationId && userId) {
+      await supabase.from('alba_messages').insert({
+        conversation_id: finalConversationId,
+        role: 'user',
+        content: message
+      });
+    }
+    
+    // Check if AI suggested expert consultation, tracked mood, or scheduled follow-up
     let needsExpert = false;
     let expertReason = "";
     let moodTracked = false;
+    let followupScheduled = false;
     let aiResponse = "";
 
     if (data.choices[0].message.tool_calls && data.choices[0].message.tool_calls.length > 0) {
+      // Get user profile for personalized messages
+      let userName = "";
+      if (userId) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', userId)
+          .single();
+        userName = profile?.name || "";
+      }
+
       // Process all tool calls
       for (const toolCall of data.choices[0].message.tool_calls) {
         if (toolCall.function.name === "suggest_expert") {
@@ -160,19 +234,11 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
           const args = JSON.parse(toolCall.function.arguments);
           expertReason = args.reason;
           
-          // Generate a natural response that includes the expert suggestion
           aiResponse = data.choices[0].message.content || 
             "Per questa situazione, ti consiglio di parlare con un'esperta che possa darti un supporto personalizzato e professionale.";
         } else if (toolCall.function.name === "track_mood" && userId) {
-          // Save mood automatically in background
           const args = JSON.parse(toolCall.function.arguments);
           try {
-            // Create Supabase client with service role
-            const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.39.3');
-            const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-            const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-            const supabase = createClient(supabaseUrl, supabaseKey);
-            
             const { error: moodError } = await supabase
               .from('moods')
               .insert({
@@ -182,14 +248,39 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
                 source: 'alba_chat'
               });
             
-            if (moodError) {
-              console.error('Error saving automatic mood:', moodError);
-            } else {
+            if (!moodError) {
               moodTracked = true;
               console.info('Mood tracked automatically:', { mood_level: args.mood_level, source: 'alba_chat' });
+            } else {
+              console.error('Error saving automatic mood:', moodError);
             }
           } catch (e) {
             console.error('Failed to track mood:', e);
+          }
+        } else if (toolCall.function.name === "schedule_followup" && userId && finalConversationId) {
+          const args = JSON.parse(toolCall.function.arguments);
+          try {
+            const followupDate = new Date();
+            followupDate.setDate(followupDate.getDate() + args.days_until_followup);
+            
+            const { error: followupError } = await supabase
+              .from('alba_followups')
+              .insert({
+                user_id: userId,
+                conversation_id: finalConversationId,
+                topic: args.topic,
+                context: args.context,
+                followup_date: followupDate.toISOString().split('T')[0]
+              });
+            
+            if (!followupError) {
+              followupScheduled = true;
+              console.info('Follow-up scheduled:', { topic: args.topic, date: followupDate });
+            } else {
+              console.error('Error scheduling follow-up:', followupError);
+            }
+          } catch (e) {
+            console.error('Failed to schedule follow-up:', e);
           }
         }
       }
@@ -199,8 +290,17 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
     if (!aiResponse) {
       aiResponse = data.choices[0].message.content;
     }
+    
+    // Save assistant message
+    if (finalConversationId && userId) {
+      await supabase.from('alba_messages').insert({
+        conversation_id: finalConversationId,
+        role: 'assistant',
+        content: aiResponse
+      });
+    }
 
-    console.log("AI Response processed:", { needsExpert, moodTracked, hasToolCall: !!data.choices[0].message.tool_calls });
+    console.log("AI Response processed:", { needsExpert, moodTracked, followupScheduled, hasToolCall: !!data.choices[0].message.tool_calls });
 
     return new Response(
       JSON.stringify({ 
@@ -208,6 +308,8 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
         needsExpert,
         expertReason,
         moodTracked,
+        followupScheduled,
+        conversationId: finalConversationId,
         category
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
