@@ -18,6 +18,22 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Get user name for personalized responses
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.39.3');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    let userName = "";
+    if (userId) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('user_id', userId)
+        .single();
+      userName = profile?.name?.split(' ')[0] || ""; // First name only
+    }
+
     // System prompt personalizzato per categoria
     const categoryPrompts = {
       "relazioni": "Sei ALBA, un'amica esperta e comprensiva che aiuta le donne di SheBloom con relazioni ed emozioni. Parli in modo naturale, caldo e personale, come farebbe un'amica che conosce bene questi temi. Condividi la tua esperienza e comprensione in modo genuino.",
@@ -30,6 +46,12 @@ serve(async (req) => {
 
     const systemPrompt = categoryPrompts[category as keyof typeof categoryPrompts] || categoryPrompts.default;
     const fullSystemPrompt = `${systemPrompt}
+
+${userName ? `L'UTENTE SI CHIAMA: ${userName}
+- USA SEMPRE il suo nome quando parli con lei, in modo naturale e affettuoso
+- Non abusarne, ma usalo come faresti con un'amica: "Ciao ${userName}!", "Guarda ${userName}...", "Ti capisco ${userName}..."
+- Falla sentire vista e considerata
+` : ''}
 
 STILE DI COMUNICAZIONE (FONDAMENTALE):
 - Parla come un'AMICA, non come un bot o un assistente formale
@@ -179,12 +201,6 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
 
     const data = await response.json();
     
-    // Create Supabase client for conversation and message storage
-    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.39.3');
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
     // Save or get conversation
     let finalConversationId = conversationId;
     if (!finalConversationId && userId) {
@@ -216,17 +232,6 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
     let aiResponse = "";
 
     if (data.choices[0].message.tool_calls && data.choices[0].message.tool_calls.length > 0) {
-      // Get user profile for personalized messages
-      let userName = "";
-      if (userId) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('name')
-          .eq('user_id', userId)
-          .single();
-        userName = profile?.name || "";
-      }
-
       // Process all tool calls
       for (const toolCall of data.choices[0].message.tool_calls) {
         if (toolCall.function.name === "suggest_expert") {
