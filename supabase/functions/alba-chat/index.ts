@@ -265,8 +265,12 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
         } else if (toolCall.function.name === "schedule_followup" && userId && finalConversationId) {
           const args = JSON.parse(toolCall.function.arguments);
           try {
-            const followupDate = new Date();
-            followupDate.setDate(followupDate.getDate() + args.days_until_followup);
+            // Calculate follow-up date safely
+            const today = new Date();
+            const daysToAdd = parseInt(args.days_until_followup) || 1;
+            const followupTimestamp = today.getTime() + (daysToAdd * 24 * 60 * 60 * 1000);
+            const followupDate = new Date(followupTimestamp);
+            const followupDateString = followupDate.toISOString().split('T')[0];
             
             const { error: followupError } = await supabase
               .from('alba_followups')
@@ -275,7 +279,7 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
                 conversation_id: finalConversationId,
                 topic: args.topic,
                 context: args.context,
-                followup_date: followupDate.toISOString().split('T')[0]
+                followup_date: followupDateString
               });
             
             if (!followupError) {
