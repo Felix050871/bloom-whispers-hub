@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/AppLayout';
 import { BloomDaily } from '@/components/BloomDaily';
 import { BloomSessions } from '@/components/BloomSessions';
 import { SocialBloom } from '@/components/SocialBloom';
+import { MoodTracker } from '@/components/MoodTracker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Heart, Users, TrendingUp, BookOpen, UserCheck } from 'lucide-react';
 import { WalletCard } from '@/components/WalletCard';
@@ -166,6 +167,14 @@ const Index = () => {
       );
     }
 
+    if (activeSection === 'mood') {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <MoodTracker />
+        </div>
+      );
+    }
+
     if (activeSection === 'appointments') {
       return (
         <div className="max-w-4xl mx-auto">
@@ -210,7 +219,7 @@ const Index = () => {
         description: "Come ti senti?",
         icon: Heart,
         color: "from-pink-500 to-rose-500",
-        action: () => console.log("Track mood")
+        action: () => handleSectionChange('mood')
       },
       {
         title: "Scrivi nel diario",
