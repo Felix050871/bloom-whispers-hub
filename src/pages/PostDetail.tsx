@@ -18,17 +18,32 @@ export default function PostDetail() {
   ]);
 
   // Mock data - in produzione verrebbe da Supabase
-  const post = {
-    id: Number(id),
-    author: 'Sofia',
-    authorType: 'community',
-    category: 'Relazioni & Emozioni',
-    content: 'Oggi ho iniziato la mia routine di gratitudine mattutina. Tre cose per cui sono grata ogni giorno. Che pace! 🌸',
-    reactions: { inspire: 12, help: 8, smile: 15 },
-    comments: 5,
-    time: '2h fa',
-    isExpert: false
+  const postsData: { [key: number]: any } = {
+    1: {
+      id: 1,
+      author: 'Sofia',
+      authorType: 'community',
+      category: 'Relazioni & Emozioni',
+      content: 'Oggi ho iniziato la mia routine di gratitudine mattutina. Tre cose per cui sono grata ogni giorno. Che pace! 🌸',
+      reactions: { inspire: 12, help: 8, smile: 15 },
+      comments: 5,
+      time: '2h fa',
+      isExpert: false
+    },
+    2: {
+      id: 2,
+      author: 'Dr.ssa Maria Rossi',
+      authorType: 'mentor',
+      category: 'Sport & Nutrimento',
+      content: 'Ricordate: non esistono cibi "cattivi". Ascoltate il vostro corpo e nutritelo con amore.',
+      reactions: { inspire: 23, help: 18, smile: 9 },
+      comments: 12,
+      time: '4h fa',
+      isExpert: true
+    }
   };
+
+  const post = postsData[Number(id)] || postsData[1];
 
 
   const reactions = [

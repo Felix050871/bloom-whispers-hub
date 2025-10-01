@@ -10,45 +10,91 @@ export default function QuestionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [newAnswer, setNewAnswer] = useState('');
-  const [answers, setAnswers] = useState([
-    {
-      id: 1,
-      author: 'Dr.ssa Maria Rossi',
-      isExpert: true,
-      content: 'L\'ansia pre-mestruale è molto comune. Ti consiglio di provare tecniche di respirazione profonda e magnesio. Anche l\'esercizio fisico regolare può aiutare molto. Se i sintomi persistono, consulta il tuo ginecologo.',
-      likes: 15,
-      time: '45min fa',
-      isAccepted: true
-    },
-    {
-      id: 2,
-      author: 'Chiara',
-      isExpert: false,
-      content: 'Io ho trovato molto utile lo yoga e la camomilla prima di dormire. Anche ridurre la caffeina mi ha aiutato tantissimo!',
-      likes: 8,
-      time: '30min fa',
-      isAccepted: false
-    },
-    {
-      id: 3,
-      author: 'Elena',
-      isExpert: false,
-      content: 'Concordo con il magnesio! A me ha cambiato la vita. Anche tenere un diario del ciclo mi aiuta a prepararmi meglio.',
-      likes: 5,
-      time: '15min fa',
-      isAccepted: false
-    }
-  ]);
+  // Risposte diverse per ogni domanda
+  const answersData: { [key: number]: any[] } = {
+    1: [
+      {
+        id: 1,
+        author: 'Dr.ssa Maria Rossi',
+        isExpert: true,
+        content: 'L\'ansia pre-mestruale è molto comune. Ti consiglio di provare tecniche di respirazione profonda e magnesio. Anche l\'esercizio fisico regolare può aiutare molto. Se i sintomi persistono, consulta il tuo ginecologo.',
+        likes: 15,
+        time: '45min fa',
+        isAccepted: true
+      },
+      {
+        id: 2,
+        author: 'Chiara',
+        isExpert: false,
+        content: 'Io ho trovato molto utile lo yoga e la camomilla prima di dormire. Anche ridurre la caffeina mi ha aiutato tantissimo!',
+        likes: 8,
+        time: '30min fa',
+        isAccepted: false
+      },
+      {
+        id: 3,
+        author: 'Elena',
+        isExpert: false,
+        content: 'Concordo con il magnesio! A me ha cambiato la vita. Anche tenere un diario del ciclo mi aiuta a prepararmi meglio.',
+        likes: 5,
+        time: '15min fa',
+        isAccepted: false
+      }
+    ],
+    2: [
+      {
+        id: 1,
+        author: 'Dr.ssa Laura Bianchi',
+        isExpert: true,
+        content: 'Per una routine semplice ma efficace: detersione mattina e sera, tonico, siero con vitamina C al mattino, crema idratante e protezione solare. La sera puoi usare un siero con retinolo o acido ialuronico.',
+        likes: 22,
+        time: '2h fa',
+        isAccepted: true
+      },
+      {
+        id: 2,
+        author: 'Martina',
+        isExpert: false,
+        content: 'Io uso solo 3 prodotti: detergente delicato, crema idratante e protezione solare. La costanza è più importante dei tanti prodotti!',
+        likes: 15,
+        time: '1h fa',
+        isAccepted: false
+      },
+      {
+        id: 3,
+        author: 'Sara',
+        isExpert: false,
+        content: 'Ti consiglio di iniziare con prodotti semplici e senza profumo. Ascolta la tua pelle e aggiungi prodotti gradualmente.',
+        likes: 10,
+        time: '30min fa',
+        isAccepted: false
+      }
+    ]
+  };
+
+  const [answers, setAnswers] = useState(answersData[Number(id)] || answersData[1]);
 
   // Mock data - in produzione verrebbe da Supabase
-  const question = {
-    id: Number(id),
-    question: 'Come gestire l\'ansia pre-mestruale?',
-    category: 'PinkCare - Salute femminile',
-    author: 'Anna',
-    time: '1h fa',
-    answers: 3
+  const questionsData: { [key: number]: any } = {
+    1: {
+      id: 1,
+      question: 'Come gestire l\'ansia pre-mestruale?',
+      category: 'PinkCare - Salute femminile',
+      author: 'Anna',
+      time: '1h fa',
+      answers: 3
+    },
+    2: {
+      id: 2,
+      question: 'Consigli per una skincare routine semplice?',
+      category: 'Beauty & Make up',
+      author: 'Giulia',
+      time: '3h fa',
+      answers: 7
+    }
   };
+
+  const question = questionsData[Number(id)] || questionsData[1];
 
 
   const handleAddAnswer = () => {
