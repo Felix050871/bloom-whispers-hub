@@ -201,6 +201,15 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
 
     const data = await response.json();
     
+    console.log('AI Response received:', { 
+      hasContent: !!data.choices[0]?.message?.content,
+      hasToolCalls: !!data.choices[0]?.message?.tool_calls,
+      toolCallsCount: data.choices[0]?.message?.tool_calls?.length || 0
+    });
+    
+    // Extract AI response content first (always available)
+    let aiResponse = data.choices[0]?.message?.content || "";
+    
     // Save or get conversation
     let finalConversationId = conversationId;
     if (!finalConversationId && userId) {
@@ -229,18 +238,16 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
     let expertReason = "";
     let moodTracked = false;
     let followupScheduled = false;
-    let aiResponse = "";
 
     if (data.choices[0].message.tool_calls && data.choices[0].message.tool_calls.length > 0) {
       // Process all tool calls
       for (const toolCall of data.choices[0].message.tool_calls) {
+        console.log('Processing tool call:', toolCall.function.name);
+        
         if (toolCall.function.name === "suggest_expert") {
           needsExpert = true;
           const args = JSON.parse(toolCall.function.arguments);
           expertReason = args.reason;
-          
-          aiResponse = data.choices[0].message.content || 
-            "Per questa situazione, ti consiglio di parlare con un'esperta che possa darti un supporto personalizzato e professionale.";
         } else if (toolCall.function.name === "track_mood" && userId) {
           const args = JSON.parse(toolCall.function.arguments);
           try {
@@ -263,8 +270,16 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
             console.error('Failed to track mood:', e);
           }
         } else if (toolCall.function.name === "schedule_followup" && userId && finalConversationId) {
-          const args = JSON.parse(toolCall.function.arguments);
           try {
+            const args = JSON.parse(toolCall.function.arguments);
+            console.log('Follow-up arguments:', args);
+            
+            // Validate required fields
+            if (!args.topic || !args.context || !args.days_until_followup) {
+              console.error('Missing required follow-up parameters:', args);
+              continue;
+            }
+            
             // Calculate follow-up date safely
             const today = new Date();
             const daysToAdd = parseInt(args.days_until_followup) || 1;
@@ -284,7 +299,7 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
             
             if (!followupError) {
               followupScheduled = true;
-              console.info('Follow-up scheduled:', { topic: args.topic, date: followupDate });
+              console.info('Follow-up scheduled successfully:', { topic: args.topic, date: followupDateString });
             } else {
               console.error('Error scheduling follow-up:', followupError);
             }
@@ -295,9 +310,9 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
       }
     }
     
-    // Use AI response if available, otherwise get from message content
-    if (!aiResponse) {
-      aiResponse = data.choices[0].message.content;
+    // Ensure we always have a response for the user
+    if (!aiResponse || aiResponse.trim() === "") {
+      aiResponse = "Mi dispiace, non sono riuscita a elaborare una risposta. Potresti riprovare?";
     }
     
     // Save assistant message
