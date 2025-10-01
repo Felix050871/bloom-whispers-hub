@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,16 @@ import { Heart, MessageCircle, Share, Plus, HelpCircle, CheckCircle } from 'luci
 
 export const SocialBloom: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('feed');
+
+  // Update active tab from navigation state
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.state]);
 
   const posts = [
     {
@@ -79,7 +88,7 @@ export const SocialBloom: React.FC = () => {
 
   return (
     <div className="pb-20">
-      <Tabs defaultValue="feed" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="feed">Feed</TabsTrigger>
           <TabsTrigger value="qa">Q&A</TabsTrigger>
@@ -224,7 +233,7 @@ export const SocialBloom: React.FC = () => {
               <Card 
                 key={q.id} 
                 className="card-bloom p-4 cursor-pointer transition-all hover:shadow-md"
-                onClick={() => navigate(`/question/${q.id}`)}
+                onClick={() => navigate(`/question/${q.id}`, { state: { fromTab: 'qa' } })}
               >
                 <div className="mb-3">
                   <h3 className="font-medium text-foreground mb-1">{q.question}</h3>

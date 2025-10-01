@@ -69,7 +69,7 @@ export default function QuestionDetail() {
   };
 
   const handleBackToQuestions = () => {
-    navigate('/', { state: { activeSection: 'community' } });
+    navigate('/', { state: { activeSection: 'community', activeTab: 'qa' } });
   };
 
   return (
