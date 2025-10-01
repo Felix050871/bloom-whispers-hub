@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, category, conversationHistory } = await req.json();
+    const { message, category, conversationHistory, userId } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -89,6 +89,29 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
               additionalProperties: false
             }
           }
+        },
+        {
+          type: "function",
+          function: {
+            name: "track_mood",
+            description: "Traccia automaticamente lo stato emotivo dell'utente quando emerge chiaramente dalla conversazione. Usa questo quando percepisci un mood significativo (positivo, negativo, neutro) che vale la pena registrare nel tempo.",
+            parameters: {
+              type: "object",
+              properties: {
+                mood_level: {
+                  type: "integer",
+                  enum: [1, 2, 3, 4, 5],
+                  description: "Livello di mood: 1=molto giù/triste, 2=non benissimo, 3=ok/neutro, 4=bene/positivo, 5=ottimo/molto felice"
+                },
+                note: {
+                  type: "string",
+                  description: "Breve nota su cosa ha causato questo mood (ricavato dal contesto della conversazione)"
+                }
+              },
+              required: ["mood_level"],
+              additionalProperties: false
+            }
+          }
         }
       ],
       tool_choice: "auto"
@@ -123,35 +146,68 @@ RICORDA: Sei un'amica esperta, non un'enciclopedia. Sii te stessa, umana, sponta
 
     const data = await response.json();
     
-    // Check if AI suggested expert consultation via tool call
+    // Check if AI suggested expert consultation or tracked mood via tool calls
     let needsExpert = false;
     let expertReason = "";
+    let moodTracked = false;
     let aiResponse = "";
 
     if (data.choices[0].message.tool_calls && data.choices[0].message.tool_calls.length > 0) {
-      // AI called the suggest_expert function
-      const toolCall = data.choices[0].message.tool_calls[0];
-      if (toolCall.function.name === "suggest_expert") {
-        needsExpert = true;
-        const args = JSON.parse(toolCall.function.arguments);
-        expertReason = args.reason;
-        
-        // Generate a natural response that includes the expert suggestion
-        aiResponse = data.choices[0].message.content || 
-          "Per questa situazione, ti consiglio di parlare con un'esperta che possa darti un supporto personalizzato e professionale.";
+      // Process all tool calls
+      for (const toolCall of data.choices[0].message.tool_calls) {
+        if (toolCall.function.name === "suggest_expert") {
+          needsExpert = true;
+          const args = JSON.parse(toolCall.function.arguments);
+          expertReason = args.reason;
+          
+          // Generate a natural response that includes the expert suggestion
+          aiResponse = data.choices[0].message.content || 
+            "Per questa situazione, ti consiglio di parlare con un'esperta che possa darti un supporto personalizzato e professionale.";
+        } else if (toolCall.function.name === "track_mood" && userId) {
+          // Save mood automatically in background
+          const args = JSON.parse(toolCall.function.arguments);
+          try {
+            // Create Supabase client with service role
+            const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.39.3');
+            const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+            const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+            const supabase = createClient(supabaseUrl, supabaseKey);
+            
+            const { error: moodError } = await supabase
+              .from('moods')
+              .insert({
+                user_id: userId,
+                mood_level: args.mood_level,
+                note: args.note || null,
+                source: 'alba_chat'
+              });
+            
+            if (moodError) {
+              console.error('Error saving automatic mood:', moodError);
+            } else {
+              moodTracked = true;
+              console.info('Mood tracked automatically:', { mood_level: args.mood_level, source: 'alba_chat' });
+            }
+          } catch (e) {
+            console.error('Failed to track mood:', e);
+          }
+        }
       }
-    } else {
-      // Normal response without tool call
+    }
+    
+    // Use AI response if available, otherwise get from message content
+    if (!aiResponse) {
       aiResponse = data.choices[0].message.content;
     }
 
-    console.log("AI Response processed:", { needsExpert, hasToolCall: !!data.choices[0].message.tool_calls });
+    console.log("AI Response processed:", { needsExpert, moodTracked, hasToolCall: !!data.choices[0].message.tool_calls });
 
     return new Response(
       JSON.stringify({ 
         response: aiResponse,
         needsExpert,
         expertReason,
+        moodTracked,
         category
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

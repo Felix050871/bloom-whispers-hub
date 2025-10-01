@@ -16,6 +16,7 @@ interface MoodEntry {
   mood_level: number;
   note: string | null;
   created_at: string;
+  source: 'manual' | 'alba_chat' | 'journal' | 'activity';
 }
 
 export const MoodTracker: React.FC = () => {
@@ -60,7 +61,7 @@ export const MoodTracker: React.FC = () => {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data) {
-        setTodayMood(data);
+        setTodayMood(data as MoodEntry);
         setSelectedMood(data.mood_level);
         setMoodNote(data.note || '');
       }
@@ -85,7 +86,7 @@ export const MoodTracker: React.FC = () => {
 
       if (error) throw error;
 
-      setRecentMoods(data || []);
+      setRecentMoods((data as MoodEntry[]) || []);
     } catch (error) {
       console.error('Error fetching recent moods:', error);
     }
@@ -103,7 +104,8 @@ export const MoodTracker: React.FC = () => {
           .from('moods')
           .update({
             mood_level: selectedMood,
-            note: moodNote || null
+            note: moodNote || null,
+            source: 'manual'
           })
           .eq('id', todayMood.id);
 
@@ -120,7 +122,8 @@ export const MoodTracker: React.FC = () => {
           .insert({
             user_id: user.id,
             mood_level: selectedMood,
-            note: moodNote || null
+            note: moodNote || null,
+            source: 'manual'
           });
 
         if (error) throw error;
@@ -147,9 +150,30 @@ export const MoodTracker: React.FC = () => {
 
   const getMoodByLevel = (level: number) => moods.find(m => m.level === level) || moods[2];
 
+  const getSourceLabel = (source: string) => {
+    const labels = {
+      manual: 'Manuale',
+      alba_chat: 'Chat con ALBA',
+      journal: 'Diario',
+      activity: 'Attività'
+    };
+    return labels[source as keyof typeof labels] || source;
+  };
+
+  const getSourceIcon = (source: string) => {
+    switch (source) {
+      case 'alba_chat': return '💬';
+      case 'journal': return '📔';
+      case 'activity': return '🏃‍♀️';
+      default: return '✍️';
+    }
+  };
+
   const averageMood = recentMoods.length > 0
     ? (recentMoods.reduce((sum, m) => sum + m.mood_level, 0) / recentMoods.length).toFixed(1)
     : '0';
+  
+  const autoTrackedCount = recentMoods.filter(m => m.source !== 'manual').length;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -244,6 +268,13 @@ export const MoodTracker: React.FC = () => {
                 {recentMoods.length} ultimi 7gg
               </Badge>
             </div>
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+              <span className="text-sm text-muted-foreground">Tracking automatico</span>
+              <Badge variant="secondary" className="gap-1">
+                <Sparkles className="w-3 h-3" />
+                {autoTrackedCount} mood
+              </Badge>
+            </div>
           </CardContent>
         </Card>
 
@@ -265,20 +296,29 @@ export const MoodTracker: React.FC = () => {
                 ) : (
                   recentMoods.map((mood) => {
                     const moodData = getMoodByLevel(mood.mood_level);
+                    const isAuto = mood.source !== 'manual';
                     return (
                       <div
                         key={mood.id}
-                        className="flex items-start gap-3 p-3 rounded-lg bg-muted/30"
+                        className={`flex items-start gap-3 p-3 rounded-lg ${
+                          isAuto ? 'bg-bloom-lilac/5 border border-bloom-lilac/20' : 'bg-muted/30'
+                        }`}
                       >
                         <span className="text-2xl">{moodData.emoji}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-medium text-foreground">
                               {moodData.label}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {format(new Date(mood.created_at), 'dd MMM', { locale: it })}
                             </span>
+                            {isAuto && (
+                              <Badge variant="outline" className="text-xs gap-1">
+                                <span>{getSourceIcon(mood.source)}</span>
+                                {getSourceLabel(mood.source)}
+                              </Badge>
+                            )}
                           </div>
                           {mood.note && (
                             <p className="text-xs text-muted-foreground mt-1 truncate">

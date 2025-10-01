@@ -4,9 +4,10 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, X, UserCheck } from 'lucide-react';
+import { Send, Sparkles, X, UserCheck, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -25,6 +26,7 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
   onClose,
   onBookExpert 
 }) => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
@@ -57,7 +59,8 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
         body: { 
           message: userMessage,
           category,
-          conversationHistory
+          conversationHistory,
+          userId: user?.id
         }
       });
 
@@ -79,6 +82,15 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
           content: data.response,
           needsExpert: data.needsExpert
         }]);
+        
+        // Show subtle notification if mood was tracked
+        if (data.moodTracked) {
+          toast({
+            title: "Mood tracciato",
+            description: "Ho registrato il tuo stato d'animo 💚",
+            duration: 2000,
+          });
+        }
       }
     } catch (error) {
       console.error('Error sending message:', error);
