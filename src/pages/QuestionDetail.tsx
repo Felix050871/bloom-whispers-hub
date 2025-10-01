@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,6 +10,7 @@ export default function QuestionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [newAnswer, setNewAnswer] = useState('');
+  const answerInputRef = useRef<HTMLTextAreaElement>(null);
   // Risposte diverse per ogni domanda
   const answersData: { [key: number]: any[] } = {
     1: [
@@ -118,6 +119,16 @@ export default function QuestionDetail() {
     navigate('/', { state: { activeSection: 'community', activeTab: 'qa' } });
   };
 
+  const handleReplyClick = (authorName: string) => {
+    // Scroll verso il campo di risposta e metti il focus
+    answerInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => {
+      answerInputRef.current?.focus();
+      // Pre-compila con riferimento all'autore
+      setNewAnswer(`@${authorName} `);
+    }, 500);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="max-w-2xl mx-auto p-4">
@@ -179,6 +190,7 @@ export default function QuestionDetail() {
               La tua risposta
             </h3>
             <Textarea
+              ref={answerInputRef}
               placeholder="Condividi la tua esperienza o consiglio..."
               value={newAnswer}
               onChange={(e) => setNewAnswer(e.target.value)}
@@ -240,7 +252,10 @@ export default function QuestionDetail() {
                   <ThumbsUp className="w-4 h-4" />
                   <span>{answer.likes}</span>
                 </button>
-                <button className="text-sm text-muted-foreground hover:text-foreground">
+                <button 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => handleReplyClick(answer.author)}
+                >
                   Rispondi
                 </button>
               </div>
