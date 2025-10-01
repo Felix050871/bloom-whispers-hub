@@ -5,13 +5,16 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, MessageCircle, Share, Plus, HelpCircle, CheckCircle } from 'lucide-react';
+import { Heart, MessageCircle, Share, Plus, HelpCircle, CheckCircle, Sparkles } from 'lucide-react';
+import { AskAlbaButton } from './AskAlbaButton';
+import { AlbaChat } from './AlbaChat';
 
 export const SocialBloom: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('feed');
+  const [showAlbaChat, setShowAlbaChat] = useState(false);
 
   // Update active tab from navigation state
   useEffect(() => {
@@ -19,6 +22,11 @@ export const SocialBloom: React.FC = () => {
       setActiveTab(location.state.activeTab);
     }
   }, [location.state]);
+
+  const handleBookExpert = () => {
+    setShowAlbaChat(false);
+    navigate('/', { state: { activeSection: 'booking' } });
+  };
 
   const posts = [
     {
@@ -103,6 +111,11 @@ export const SocialBloom: React.FC = () => {
             <p className="text-muted-foreground">
               Una community gentile dove crescere insieme
             </p>
+            
+            {/* Ask ALBA Button */}
+            <div className="mt-4">
+              <AskAlbaButton onClick={() => setShowAlbaChat(true)} />
+            </div>
           </div>
 
           {/* Filtri */}
@@ -192,6 +205,11 @@ export const SocialBloom: React.FC = () => {
             <p className="text-muted-foreground">
               Chiedi e rispondi nella community
             </p>
+            
+            {/* Ask ALBA Button */}
+            <div className="mt-4">
+              <AskAlbaButton onClick={() => setShowAlbaChat(true)} />
+            </div>
           </div>
 
           {/* Nuova domanda */}
@@ -261,6 +279,15 @@ export const SocialBloom: React.FC = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* ALBA Chat Modal */}
+      {showAlbaChat && (
+        <AlbaChat 
+          category="relazioni" 
+          onClose={() => setShowAlbaChat(false)}
+          onBookExpert={handleBookExpert}
+        />
+      )}
     </div>
   );
 };

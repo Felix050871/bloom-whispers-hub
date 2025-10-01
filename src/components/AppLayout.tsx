@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { UserMenu } from "@/components/UserMenu";
+import { AlbaFAB } from "@/components/AlbaFAB";
 import shebloomLogo from "@/assets/shebloom-logo.png";
 import shebloomIcon from "@/assets/shebloom-icon.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -99,6 +100,9 @@ export function AppLayout({ children, activeSection, onSectionChange }: AppLayou
           {children}
         </div>
       </main>
+
+      {/* ALBA FAB - Always visible */}
+      <AlbaFAB category={activeSection} />
 
       {/* Bottom Navigation */}
       <BottomNavigation 
