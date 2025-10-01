@@ -10,6 +10,7 @@ export default function QuestionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [newAnswer, setNewAnswer] = useState('');
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const answerInputRef = useRef<HTMLTextAreaElement>(null);
   // Risposte diverse per ogni domanda
   const answersData: { [key: number]: any[] } = {
@@ -21,7 +22,8 @@ export default function QuestionDetail() {
         content: 'L\'ansia pre-mestruale è molto comune. Ti consiglio di provare tecniche di respirazione profonda e magnesio. Anche l\'esercizio fisico regolare può aiutare molto. Se i sintomi persistono, consulta il tuo ginecologo.',
         likes: 15,
         time: '45min fa',
-        isAccepted: true
+        isAccepted: true,
+        replies: []
       },
       {
         id: 2,
@@ -30,7 +32,17 @@ export default function QuestionDetail() {
         content: 'Io ho trovato molto utile lo yoga e la camomilla prima di dormire. Anche ridurre la caffeina mi ha aiutato tantissimo!',
         likes: 8,
         time: '30min fa',
-        isAccepted: false
+        isAccepted: false,
+        replies: [
+          {
+            id: 21,
+            author: 'Elena',
+            isExpert: false,
+            content: 'Grazie per il consiglio! Quale tipo di yoga consigli?',
+            likes: 2,
+            time: '20min fa'
+          }
+        ]
       },
       {
         id: 3,
@@ -39,7 +51,8 @@ export default function QuestionDetail() {
         content: 'Concordo con il magnesio! A me ha cambiato la vita. Anche tenere un diario del ciclo mi aiuta a prepararmi meglio.',
         likes: 5,
         time: '15min fa',
-        isAccepted: false
+        isAccepted: false,
+        replies: []
       }
     ],
     2: [
@@ -50,7 +63,8 @@ export default function QuestionDetail() {
         content: 'Per una routine semplice ma efficace: detersione mattina e sera, tonico, siero con vitamina C al mattino, crema idratante e protezione solare. La sera puoi usare un siero con retinolo o acido ialuronico.',
         likes: 22,
         time: '2h fa',
-        isAccepted: true
+        isAccepted: true,
+        replies: []
       },
       {
         id: 2,
@@ -59,7 +73,8 @@ export default function QuestionDetail() {
         content: 'Io uso solo 3 prodotti: detergente delicato, crema idratante e protezione solare. La costanza è più importante dei tanti prodotti!',
         likes: 15,
         time: '1h fa',
-        isAccepted: false
+        isAccepted: false,
+        replies: []
       },
       {
         id: 3,
@@ -68,7 +83,8 @@ export default function QuestionDetail() {
         content: 'Ti consiglio di iniziare con prodotti semplici e senza profumo. Ascolta la tua pelle e aggiungi prodotti gradualmente.',
         likes: 10,
         time: '30min fa',
-        isAccepted: false
+        isAccepted: false,
+        replies: []
       }
     ]
   };
@@ -100,18 +116,45 @@ export default function QuestionDetail() {
 
   const handleAddAnswer = () => {
     if (newAnswer.trim()) {
-      const newAnswerObj = {
-        id: answers.length + 1,
-        author: 'Tu',
-        isExpert: false,
-        content: newAnswer,
-        likes: 0,
-        time: 'Adesso',
-        isAccepted: false
-      };
-      setAnswers([...answers, newAnswerObj]);
+      if (replyingTo !== null) {
+        // Aggiungi come risposta annidata
+        const updatedAnswers = answers.map(answer => {
+          if (answer.id === replyingTo) {
+            return {
+              ...answer,
+              replies: [
+                ...(answer.replies || []),
+                {
+                  id: Date.now(),
+                  author: 'Tu',
+                  isExpert: false,
+                  content: newAnswer,
+                  likes: 0,
+                  time: 'Adesso'
+                }
+              ]
+            };
+          }
+          return answer;
+        });
+        setAnswers(updatedAnswers);
+      } else {
+        // Aggiungi come risposta principale
+        const newAnswerObj = {
+          id: answers.length + 1,
+          author: 'Tu',
+          isExpert: false,
+          content: newAnswer,
+          likes: 0,
+          time: 'Adesso',
+          isAccepted: false,
+          replies: []
+        };
+        setAnswers([...answers, newAnswerObj]);
+      }
       setNewAnswer('');
-      console.log('Risposta aggiunta:', newAnswerObj);
+      setReplyingTo(null);
+      console.log('Risposta aggiunta');
     }
   };
 
@@ -119,7 +162,8 @@ export default function QuestionDetail() {
     navigate('/', { state: { activeSection: 'community', activeTab: 'qa' } });
   };
 
-  const handleReplyClick = (authorName: string) => {
+  const handleReplyClick = (answerId: number, authorName: string) => {
+    setReplyingTo(answerId);
     // Scroll verso il campo di risposta e metti il focus
     answerInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setTimeout(() => {
@@ -127,6 +171,11 @@ export default function QuestionDetail() {
       // Pre-compila con riferimento all'autore
       setNewAnswer(`@${authorName} `);
     }, 500);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+    setNewAnswer('');
   };
 
   return (
@@ -186,9 +235,23 @@ export default function QuestionDetail() {
 
           {/* Add Answer */}
           <Card className="card-bloom p-4">
-            <h3 className="font-medium text-sm text-foreground mb-3">
-              La tua risposta
-            </h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-sm text-foreground">
+                {replyingTo !== null 
+                  ? `Rispondi a ${answers.find(a => a.id === replyingTo)?.author}`
+                  : 'La tua risposta'
+                }
+              </h3>
+              {replyingTo !== null && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleCancelReply}
+                >
+                  Annulla
+                </Button>
+              )}
+            </div>
             <Textarea
               ref={answerInputRef}
               placeholder="Condividi la tua esperienza o consiglio..."
@@ -210,56 +273,89 @@ export default function QuestionDetail() {
 
           {/* Answers List */}
           {answers.map((answer) => (
-            <Card 
-              key={answer.id} 
-              className={`p-4 ${
-                answer.isAccepted 
-                  ? 'border-2 border-vital-red/30 card-petal' 
-                  : 'card-bloom'
-              }`}
-            >
-              <div className="flex items-start space-x-3 mb-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-bloom-lilac to-bloom-lilac/60 rounded-full flex items-center justify-center text-white font-medium">
-                  {answer.author[0]}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span className="font-medium text-sm text-foreground">
-                      {answer.author}
-                    </span>
-                    {answer.isExpert && (
-                      <Badge variant="secondary" className="bg-vital-red/20 text-vital-red text-xs">
-                        Esperta
-                      </Badge>
-                    )}
-                    {answer.isAccepted && (
-                      <Badge variant="secondary" className="bg-green-500/20 text-green-600 text-xs">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Risposta migliore
-                      </Badge>
-                    )}
-                    <span className="text-xs text-muted-foreground">{answer.time}</span>
+            <div key={answer.id} className="space-y-3">
+              <Card 
+                className={`p-4 ${
+                  answer.isAccepted 
+                    ? 'border-2 border-vital-red/30 card-petal' 
+                    : 'card-bloom'
+                }`}
+              >
+                <div className="flex items-start space-x-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-bloom-lilac to-bloom-lilac/60 rounded-full flex items-center justify-center text-white font-medium">
+                    {answer.author[0]}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="font-medium text-sm text-foreground">
+                        {answer.author}
+                      </span>
+                      {answer.isExpert && (
+                        <Badge variant="secondary" className="bg-vital-red/20 text-vital-red text-xs">
+                          Esperta
+                        </Badge>
+                      )}
+                      {answer.isAccepted && (
+                        <Badge variant="secondary" className="bg-green-500/20 text-green-600 text-xs">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Risposta migliore
+                        </Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">{answer.time}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <p className="text-sm text-foreground leading-relaxed mb-3">
-                {answer.content}
-              </p>
+                <p className="text-sm text-foreground leading-relaxed mb-3">
+                  {answer.content}
+                </p>
 
-              <div className="flex items-center space-x-4 pt-3 border-t border-border">
-                <button className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-bloom-lilac">
-                  <ThumbsUp className="w-4 h-4" />
-                  <span>{answer.likes}</span>
-                </button>
-                <button 
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => handleReplyClick(answer.author)}
-                >
-                  Rispondi
-                </button>
-              </div>
-            </Card>
+                <div className="flex items-center space-x-4 pt-3 border-t border-border">
+                  <button className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-bloom-lilac">
+                    <ThumbsUp className="w-4 h-4" />
+                    <span>{answer.likes}</span>
+                  </button>
+                  <button 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => handleReplyClick(answer.id, answer.author)}
+                  >
+                    Rispondi
+                  </button>
+                </div>
+              </Card>
+
+              {/* Nested Replies */}
+              {answer.replies && answer.replies.length > 0 && (
+                <div className="ml-12 space-y-2">
+                  {answer.replies.map((reply: any) => (
+                    <Card key={reply.id} className="card-bloom p-3 bg-muted/30">
+                      <div className="flex items-start space-x-2 mb-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-bloom-lilac to-bloom-lilac/60 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                          {reply.author[0]}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className="font-medium text-xs text-foreground">
+                              {reply.author}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{reply.time}</span>
+                          </div>
+                          <p className="text-xs text-foreground leading-relaxed">
+                            {reply.content}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 ml-10">
+                        <button className="flex items-center space-x-1 text-xs text-muted-foreground hover:text-bloom-lilac">
+                          <ThumbsUp className="w-3 h-3" />
+                          <span>{reply.likes}</span>
+                        </button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>
