@@ -458,6 +458,8 @@ export type Database = {
           preferred_workout_time: string | null
           skin_concerns: string[] | null
           skin_type: string | null
+          sos_message: string | null
+          sos_share_location: boolean | null
           updated_at: string | null
           user_id: string
           weight_kg: number | null
@@ -485,6 +487,8 @@ export type Database = {
           preferred_workout_time?: string | null
           skin_concerns?: string[] | null
           skin_type?: string | null
+          sos_message?: string | null
+          sos_share_location?: boolean | null
           updated_at?: string | null
           user_id: string
           weight_kg?: number | null
@@ -512,6 +516,8 @@ export type Database = {
           preferred_workout_time?: string | null
           skin_concerns?: string[] | null
           skin_type?: string | null
+          sos_message?: string | null
+          sos_share_location?: boolean | null
           updated_at?: string | null
           user_id?: string
           weight_kg?: number | null
@@ -538,6 +544,39 @@ export type Database = {
           created_at?: string | null
           id?: string
           question?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sos_contacts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_primary: boolean | null
+          name: string
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name: string
+          phone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name?: string
+          phone?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

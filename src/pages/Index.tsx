@@ -8,6 +8,7 @@ import { SocialBloom } from '@/components/SocialBloom';
 import { MoodTracker } from '@/components/MoodTracker';
 import { AlbaFollowups } from '@/components/AlbaFollowups';
 import { UserProfileDialog } from '@/components/UserProfileDialog';
+import { SOSContactsSettings } from '@/components/SOSContactsSettings';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -336,6 +337,9 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* SOS ALBA Settings */}
+          <SOSContactsSettings />
         </div>
       );
     }
