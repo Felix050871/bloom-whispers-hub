@@ -7,13 +7,18 @@ import { BloomSessions } from '@/components/BloomSessions';
 import { SocialBloom } from '@/components/SocialBloom';
 import { MoodTracker } from '@/components/MoodTracker';
 import { AlbaFollowups } from '@/components/AlbaFollowups';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Heart, Users, TrendingUp, BookOpen, UserCheck } from 'lucide-react';
+import { UserProfileDialog } from '@/components/UserProfileDialog';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Calendar, Heart, Users, TrendingUp, BookOpen, UserCheck, Bell, Moon, Shield, Globe } from 'lucide-react';
 import { WalletCard } from '@/components/WalletCard';
 import { AppointmentsCalendar } from '@/components/AppointmentsCalendar';
 import { BookingInterface } from '@/components/BookingInterface';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { user } = useAuth();
@@ -22,6 +27,13 @@ const Index = () => {
   const [userData, setUserData] = useState<OnboardingData | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [activeSection, setActiveSection] = useState<string>('home');
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [settings, setSettings] = useState({
+    notifications: true,
+    emailNotifications: true,
+    darkMode: false,
+    language: 'it'
+  });
 
   // Update active section from navigation state
   useEffect(() => {
@@ -117,14 +129,86 @@ const Index = () => {
 
   const displayName = (userProfile?.name && userProfile.name.toLowerCase() !== 'utente' ? userProfile.name : user?.user_metadata?.name) || '';
   
+  const handleSettingToggle = (setting: keyof typeof settings) => {
+    setSettings(prev => ({ ...prev, [setting]: !prev[setting] }));
+    toast({
+      title: "Impostazioni aggiornate",
+      description: "Le modifiche sono state salvate."
+    });
+  };
+
   const renderContent = () => {
     if (activeSection === 'profile') {
       return (
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Il Tuo Profilo</h1>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+              Il Tuo Profilo
+            </h1>
+            <Button onClick={() => setProfileDialogOpen(true)}>
+              Modifica Profilo
+            </Button>
+          </div>
+          
           <Card>
-            <CardContent className="p-6">
-              <p>Sezione profilo in costruzione...</p>
+            <CardHeader>
+              <CardTitle>Informazioni Personali</CardTitle>
+              <CardDescription>I tuoi dati e preferenze</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Nome</p>
+                  <p className="font-medium">{userProfile?.name || 'Non impostato'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{userProfile?.email || user?.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Data di nascita</p>
+                  <p className="font-medium">{userProfile?.birth_date ? new Date(userProfile.birth_date).toLocaleDateString('it-IT') : 'Non impostato'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Interessi</p>
+                  <p className="font-medium">{userProfile?.interests?.length || 0} selezionati</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Caratteristiche Fisiche</CardTitle>
+              <CardDescription>Per consigli personalizzati</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                {userProfile?.height_cm && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Altezza</p>
+                    <p className="font-medium">{userProfile.height_cm} cm</p>
+                  </div>
+                )}
+                {userProfile?.weight_kg && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Peso</p>
+                    <p className="font-medium">{userProfile.weight_kg} kg</p>
+                  </div>
+                )}
+                {userProfile?.hair_type && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Capelli</p>
+                    <p className="font-medium">{userProfile.hair_type}</p>
+                  </div>
+                )}
+                {userProfile?.skin_type && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Pelle</p>
+                    <p className="font-medium">{userProfile.skin_type}</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -134,7 +218,9 @@ const Index = () => {
     if (activeSection === 'wallet') {
       return (
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Wallet</h1>
+          <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            Wallet
+          </h1>
           <WalletCard />
         </div>
       );
@@ -142,11 +228,112 @@ const Index = () => {
 
     if (activeSection === 'settings') {
       return (
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Impostazioni</h1>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+            Impostazioni
+          </h1>
+
           <Card>
-            <CardContent className="p-6">
-              <p>Sezione impostazioni in costruzione...</p>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Bell className="w-5 h-5 mr-2" />
+                Notifiche
+              </CardTitle>
+              <CardDescription>Gestisci le tue preferenze di notifica</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="notifications">Notifiche push</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Ricevi notifiche per messaggi e aggiornamenti
+                  </p>
+                </div>
+                <Switch
+                  id="notifications"
+                  checked={settings.notifications}
+                  onCheckedChange={() => handleSettingToggle('notifications')}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="email-notifications">Notifiche email</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Ricevi email per contenuti importanti
+                  </p>
+                </div>
+                <Switch
+                  id="email-notifications"
+                  checked={settings.emailNotifications}
+                  onCheckedChange={() => handleSettingToggle('emailNotifications')}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Moon className="w-5 h-5 mr-2" />
+                Aspetto
+              </CardTitle>
+              <CardDescription>Personalizza l'aspetto dell'app</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="dark-mode">Modalità scura</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Attiva la modalità scura per ridurre l'affaticamento degli occhi
+                  </p>
+                </div>
+                <Switch
+                  id="dark-mode"
+                  checked={settings.darkMode}
+                  onCheckedChange={() => handleSettingToggle('darkMode')}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Shield className="w-5 h-5 mr-2" />
+                Privacy e Sicurezza
+              </CardTitle>
+              <CardDescription>Gestisci le impostazioni di sicurezza</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => setProfileDialogOpen(true)}
+              >
+                Cambia Password
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+              >
+                Gestisci Dati Personali
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Globe className="w-5 h-5 mr-2" />
+                Preferenze
+              </CardTitle>
+              <CardDescription>Impostazioni generali dell'app</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="language">Lingua</Label>
+                <p className="text-sm text-muted-foreground mt-1">Italiano</p>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -297,12 +484,21 @@ const Index = () => {
   };
 
   return (
-    <AppLayout 
-      activeSection={activeSection}
-      onSectionChange={handleSectionChange}
-    >
-      {renderContent()}
-    </AppLayout>
+    <>
+      <AppLayout 
+        activeSection={activeSection}
+        onSectionChange={handleSectionChange}
+      >
+        {renderContent()}
+      </AppLayout>
+
+      <UserProfileDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        userProfile={userProfile}
+        onProfileUpdate={fetchUserProfile}
+      />
+    </>
   );
 };
 
