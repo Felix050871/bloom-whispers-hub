@@ -42,11 +42,12 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
 
   const categories = [
     { id: 'general', label: 'Generale', icon: '💬', color: 'from-bloom-lilac to-bloom-lilac/80' },
-    { id: 'health', label: 'Salute', icon: '❤️', color: 'from-vital-red to-vital-red/80' },
-    { id: 'beauty', label: 'Bellezza', icon: '✨', color: 'from-pink-400 to-pink-500' },
-    { id: 'fitness', label: 'Fitness', icon: '💪', color: 'from-green-400 to-green-500' },
-    { id: 'nutrition', label: 'Alimentazione', icon: '🥗', color: 'from-orange-400 to-orange-500' },
-    { id: 'wellness', label: 'Benessere', icon: '🧘‍♀️', color: 'from-purple-400 to-purple-500' },
+    { id: 'relationships', label: 'Relazioni&Emozioni', icon: '💕', color: 'from-pink-400 to-pink-500' },
+    { id: 'pinkcare', label: 'PinkCare', icon: '❤️', color: 'from-vital-red to-vital-red/80' },
+    { id: 'sport', label: 'Sport&Nutrimento', icon: '💪', color: 'from-green-400 to-green-500' },
+    { id: 'beauty', label: 'Beauty & Make up', icon: '✨', color: 'from-purple-400 to-purple-500' },
+    { id: 'style', label: 'Stile & Identità', icon: '👗', color: 'from-blue-400 to-blue-500' },
+    { id: 'astrology', label: 'Cartomanzia &Astrologia', icon: '🔮', color: 'from-indigo-400 to-indigo-500' },
   ];
 
   useEffect(() => {
