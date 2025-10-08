@@ -22,11 +22,12 @@ interface AlbaChatProps {
 }
 
 export const AlbaChat: React.FC<AlbaChatProps> = ({ 
-  category = 'default', 
+  category: initialCategory = 'default', 
   onClose,
   onBookExpert 
 }) => {
   const { user } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
@@ -38,6 +39,15 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
   const [conversationId, setConversationId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  const categories = [
+    { id: 'general', label: 'Generale', icon: '💬', color: 'from-bloom-lilac to-bloom-lilac/80' },
+    { id: 'health', label: 'Salute', icon: '❤️', color: 'from-vital-red to-vital-red/80' },
+    { id: 'beauty', label: 'Bellezza', icon: '✨', color: 'from-pink-400 to-pink-500' },
+    { id: 'fitness', label: 'Fitness', icon: '💪', color: 'from-green-400 to-green-500' },
+    { id: 'nutrition', label: 'Alimentazione', icon: '🥗', color: 'from-orange-400 to-orange-500' },
+    { id: 'wellness', label: 'Benessere', icon: '🧘‍♀️', color: 'from-purple-400 to-purple-500' },
+  ];
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -59,7 +69,7 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
       const { data, error } = await supabase.functions.invoke('alba-chat', {
         body: { 
           message: userMessage,
-          category,
+          category: selectedCategory || initialCategory,
           conversationHistory,
           userId: user?.id,
           conversationId
@@ -152,6 +162,27 @@ export const AlbaChat: React.FC<AlbaChatProps> = ({
       {/* Messages */}
       <ScrollArea ref={scrollRef} className="flex-1 p-4">
         <div className="space-y-4">
+          {/* Category Selection */}
+          {!selectedCategory && messages.length === 1 && (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground text-center">
+                Seleziona una categoria per iniziare:
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {categories.map((cat) => (
+                  <Button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`h-auto flex-col gap-1 py-3 bg-gradient-to-br ${cat.color} text-white hover:opacity-90`}
+                  >
+                    <span className="text-2xl">{cat.icon}</span>
+                    <span className="text-xs font-medium">{cat.label}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] space-y-2`}>
